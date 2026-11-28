@@ -20,6 +20,7 @@ import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
+import { fitLife, REF as LIFE_REF } from "./life-model.mjs";
 import { ratingSeries as ldRatingSeries, ppmSeries as ldPpmSeries, fitSettings as ldFit, lineMoments as ldMoments, drawReads as ldDrawReads, houseCoef as ldHouseCoef } from "./leader-model.mjs";
 import { tppRead, tppNowOut, tppChgOut } from "./primary-model.mjs";
 import { fitSwitch, colOf as swCol, pOf as swP, mean as swMean, quant as swQuant } from "./switch-model.mjs";
@@ -3444,42 +3445,120 @@ const trustGov = (() => {
     + ` | best ${JSON.stringify(fit.best)}${fit.edges.length ? " | GRID EDGE " + fit.edges : ""}`);
   return { series, model };
 })();
-/* Life satisfaction stays on each survey's own published terms. Annual
-   sources can name only a year; those dots sit at the middle of that year,
-   while wave and fieldwork labels retain their printed precision. */
+/* §5u Life satisfaction – the National mood section's third view.
+   Hand-filed in data/life-satisfaction.json; every reading keeps its printed
+   figure. One line from the surveys that move together (life-model.mjs:
+   ANUpoll's two panels and the ABS General Social Survey), on ANUpoll's
+   current panel's terms. HILDA and one-off surveys ride beside it as
+   printed. Annual readings (a year only) sit at their series' midMonth. */
 const lifeSat = (() => {
   if (JUR) return null;
   let src;
   try { src = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "life-satisfaction.json"), "utf8")); }
-  catch { return null; }
-  const xOf = (s) => {
-    const [y, m, d] = s.split("-").map(Number);
-    return y + (m ? m - 1 + (d ? (d - 0.5) / 31 : 0.5) : 0.5) / (m ? 12 : 1);
-  };
+  catch (e) { console.error("life satisfaction: view SKIPPED – " + e.message); return null; }
+  const ymOfR = (s, r) => (r.date.length === 4 ? `${r.date}-${s.midMonth || "07"}` : r.date.slice(0, 7));
   const series = (src.series || []).map((s) => ({
     ...s,
-    readings: [...s.readings].sort((a, b) => a.date.localeCompare(b.date)).map((r) => ({ ...r, x: xOf(r.date) })),
+    readings: [...s.readings].sort((a, b) => a.date.localeCompare(b.date)).map((r) => ({ ...r, x: mx(ymOfR(s, r)) })),
   })).filter((s) => s.readings.length);
-  let snapshots = src.snapshots || [];
-  if (!snapshots.length) {
-    try {
-      const demos = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demosau-one-offs.json"), "utf8"));
-      const d = (demos.one_offs || []).find((e) => e.id === "life-satisfaction");
-      const tables = d && d.data.tables || [];
+
+  /* DemosAU's 0–100 score: the newest wave of its wellbeing index on file
+     (a later wave carries its own id, "life-satisfaction-<year>"), with that
+     wave's own fieldwork dates */
+  let snapshots = [];
+  try {
+    const demos = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demosau-one-offs.json"), "utf8"));
+    const d = (demos.one_offs || []).filter((e) => /^life-satisfaction(-|$)/.test(e.id))
+      .sort((a, b) => a.waveDate.localeCompare(b.waveDate)).pop();
+    if (d) {
+      const tables = d.data?.tables || [];
       const all = tables.find((t) => t.name === "All Respondents");
-      const scores = tables.find((t) => t.name === "Index scores");
-      const score = scores && scores.rows.find((r) => r[0] === "Life Satisfaction Score");
-      if (d && all && score) snapshots = [{
+      const score = tables.find((t) => t.name === "Index scores")?.rows.find((r) => r[0] === "Life Satisfaction Score");
+      if (!all || !score) throw new Error(d.id + " has no distribution or no score table");
+      const day = (iso, year) => `${+iso.slice(8, 10)} ${MNF[+iso.slice(5, 7) - 1]}${year ? " " + iso.slice(0, 4) : ""}`;
+      const f = d.fieldwork;
+      snapshots = [{
         id: "demosau-life-satisfaction", house: "DemosAU", scaleMax: 100,
-        date: d.waveDate.slice(0, 7), field: "5 October – 24 November 2025",
+        date: d.waveDate.slice(0, 7), field: f ? `${day(f.start, f.start.slice(0, 4) !== f.end.slice(0, 4))} – ${day(f.end, true)}` : null,
         n: d.sample, v: +score[1], source: d.articleUrl,
         question: d.question,
-        note: "The five-point answer scale is printed separately from the 0–10 mean surveys; this snapshot is kept on DemosAU’s own 0–100 basis.",
+        note: "So it isn’t comparable with the 0–10 means.",
         distribution: all.rows.map((r) => ({ label: r[0], v: +r[1] })),
       }];
-    } catch { /* a missing optional snapshot never blocks the series */ }
+    }
+  } catch (e) { console.error("life satisfaction: DemosAU snapshot SKIPPED – " + e.message); }
+  if (!series.length) return null;
+
+  const houseOf = (s, r) => (s.id === "anupoll" ? (r.panel === "lia" ? "anupoll-lia" : LIFE_REF) : s.id === "abs-gss" ? "abs-gss" : null);
+  /* sample sizes where a wave's is not printed in what is filed: ANUpoll's
+     usual wave */
+  const LIFE_N = { "anupoll-lia": 3300, [LIFE_REF]: 3500, "abs-gss": 5000 };
+  const LDAY = (ym) => Math.floor(Date.parse(ym + "-15T00:00:00Z") / 86400000);
+  const readings = [];
+  for (const s of series) for (const r of s.readings) {
+    const house = houseOf(s, r);
+    if (house) readings.push({ house, day: LDAY(ymOfR(s, r)), v: r.v, n: r.n || LIFE_N[house], sid: s.id, date: r.date, ym: ymOfR(s, r) });
   }
-  return series.length || snapshots.length ? { ...src, series, snapshots } : null;
+  if (!readings.some((r) => r.house === LIFE_REF)) return { ...src, series, snapshots, model: null };
+  const rFirst = Math.min(...readings.map((r) => r.day)), rLast = Math.max(...readings.map((r) => r.day));
+  const ymOfDay = (d) => new Date(d * 86400000).toISOString().slice(0, 7);
+  const months = [];
+  for (let y = +ymOfDay(rFirst).slice(0, 4), m = +ymOfDay(rFirst).slice(5, 7); ; m++) {
+    if (m > 12) { m = 1; y++; }
+    const ym = `${y}-${String(m).padStart(2, "0")}`, day = LDAY(ym);
+    if (day > rLast) break;
+    months.push({ ym, day });
+  }
+  /* "since just after the election": ANUpoll's first wave from the polling month on */
+  const elecYm = ELECTION.date.slice(0, 7);
+  const after = readings.filter((r) => r.house === LIFE_REF && r.ym >= elecYm && r.day < rLast).sort((a, b) => a.day - b.day)[0] || null;
+  const yearAgo = LDAY(`${+ymOfDay(rLast).slice(0, 4) - 1}${ymOfDay(rLast).slice(4)}`);
+  const t0 = Date.now();
+  const fit = fitLife(readings, { days: [...months.map((m) => m.day), yearAgo, ...(after ? [after.day] : [])], nDraw: 2000 });
+  const at = (day) => fit.draws.map((d) => d.v[fit.slotOfDay.get(day)]);
+  const S = (a) => ({ v: r2(tmean(a)), lo: r2(tquant(a, 0.025)), hi: r2(tquant(a, 0.975)) });
+  /* the line runs from ANUpoll's first wave: before it there are only the
+     General Social Survey's readings years apart, which show as dots */
+  const from = ymOfDay(Math.min(...readings.filter((r) => r.house !== "abs-gss").map((r) => r.day)));
+  const mRows = months.filter((m) => m.ym >= from).map(({ ym, day }) => ({ ym, x: mx(ym), ...S(at(day)) }));
+  const nowA = at(rLast);
+  const diffS = (a, b) => { const d = a.map((v, i) => v - b[i]); const s = S(d); return { chg: s.v, lo: s.lo, hi: s.hi, sig: s.lo > 0 || s.hi < 0, pUp: r2(d.filter((v) => v > 0).length / d.length) }; };
+  /* "the lowest since <month>": today must sit significantly below every
+     month after that one (95% of draws); "record" when no earlier month on
+     the solid line is at or below today */
+  const lowest = (() => {
+    const span = months.filter((m) => m.ym >= from && m.day < rLast - 60), nowMean = tmean(nowA);
+    const last = span.filter((m) => tmean(at(m.day)) <= nowMean).pop();
+    const between = span.filter((m) => !last || m.day > last.day);
+    const sure = between.every((m) => { const a = at(m.day); let k = 0; for (let i = 0; i < a.length; i++) if (nowA[i] < a[i]) k++; return k / a.length >= 0.95; });
+    if (!between.length || !sure) return null;
+    return last ? { since: last.ym } : { record: true };
+  })();
+  /* how likely today is the lowest month of the whole solid line */
+  const pLowest = (() => {
+    const earlier = months.filter((m) => m.ym >= from && m.day < rLast - 60).map((m) => at(m.day));
+    let k = 0; for (let i = 0; i < nowA.length; i++) if (earlier.every((a) => nowA[i] <= a[i])) k++;
+    return r2(k / nowA.length);
+  })();
+  const adj = {};
+  for (const r of readings) (adj[r.sid] ||= []).push({ date: r.date, x: mx(r.ym), v: r2(r.v - fit.leanAt(r.house, r.day)), printed: r.v });
+  const gap = fit.draws.map((d) => d.panel);
+  const model = {
+    ref: "ANUpoll", method: "bayes", draws: fit.n, readings: readings.length, months: mRows,
+    inModel: [...new Set(readings.map((r) => r.sid))],
+    now: { ym: ymOfDay(rLast), x: mx(ymOfDay(rLast)), ...S(nowA),
+      year: { from: ymOfDay(yearAgo), ...diffS(nowA, at(yearAgo)) },
+      ...(after ? { election: { date: ELECTION.date, ym: after.ym, ...diffS(nowA, at(after.day)) } } : {}),
+      lowest, pLowest },
+    /* ANUpoll's newest printed wave, and whether any wave on file prints lower */
+    latestPrint: (() => { const rs = series.find((s) => s.id === "anupoll").readings, a = rs[rs.length - 1]; return { ym: a.date.slice(0, 7), v: a.v, lowest: rs.every((r) => r.v >= a.v) }; })(),
+    adj, panelGap: fit.panelDay != null ? { ym: ymOfDay(fit.panelDay), ...S(gap) } : null,
+  };
+  console.log(`life model: ${readings.length} readings in ${((Date.now() - t0) / 1000).toFixed(1)}s | now ${model.now.v} [${model.now.lo}, ${model.now.hi}]`
+    + ` | year ${model.now.year.chg} [${model.now.year.lo}, ${model.now.year.hi}]${after ? ` | since election ${model.now.election.chg} [${model.now.election.lo}, ${model.now.election.hi}]` : ""}`
+    + ` | lowest ${JSON.stringify(lowest)} p ${pLowest} | line from ${from} | LiA gap ${model.panelGap?.v} [${model.panelGap?.lo}, ${model.panelGap?.hi}]`
+    + ` | best ${JSON.stringify(fit.best)}${fit.edges.length ? " | GRID EDGE " + fit.edges : ""}`);
+  return { ...src, series, snapshots, model };
 })();
 const directionStates = (() => {
   if (!SEC_STATES?.series) return null;
@@ -12888,7 +12967,7 @@ if (!JUR && LDM && leaderModel) {
    readings, so the draws behind the site's printed figures stay as they
    are; the last week is the site's figure for today (directionNow). */
 const DAWN_MOOD_ASSET = path.join(OUT_DIR, "dawn-mood.json");
-if (!JUR && DIRM && trustGov && trustGov.model) {
+if (!JUR && DIRM && trustGov && trustGov.model && lifeSat && lifeSat.model) {
   try {
     const t1 = DIR_DAY(LATEST_ISO), eDay = DIR_DAY(ELECTION.date);
     const weeks = [];
@@ -12933,6 +13012,12 @@ if (!JUR && DIRM && trustGov && trustGov.model) {
       const src = TS[sid], o = src && src.readings[i];
       return { x: r2(r.x), v: r.v, who: (o && o.survey) || (src ? src.house : sid), date: r.date, ...(o && o.field ? { field: o.field } : {}), ...(o ? { printed: o.v } : {}), ...(o && o.n ? { n: o.n } : {}) };
     })).sort((a, b) => a.x - b.x);
+    const LM = lifeSat.model, LS = Object.fromEntries(lifeSat.series.map((x) => [x.id, x]));
+    const lifeDots = Object.entries(LM.adj).flatMap(([sid, rs]) => rs.map((r, i) => {
+      const o = LS[sid].readings[i];
+      return { x: r2(r.x), v: r.v, who: LS[sid].house, date: o.date.slice(0, 7), ...(o.field ? { field: o.field } : {}), printed: o.v, ...(o.n ? { n: o.n } : {}) };
+    })).sort((a, b) => a.x - b.x);
+    const asPrinted = (id) => (LS[id] ? LS[id].readings.map((r) => ({ x: r2(r.x), v: r.v, date: r.date })) : []);
     const rated = individualPolls.concat(directionOnlyPolls || []).filter((x) => x.dir);
     const newest = rated.slice().sort((a, b) => ((a.published || a.released) < (b.published || b.released) ? 1 : -1))[0];
     writeAtomic(DAWN_MOOD_ASSET, JSON.stringify({
@@ -12943,7 +13028,11 @@ if (!JUR && DIRM && trustGov && trustGov.model) {
         months: TM.months.filter((m) => m.ym >= TM.firstFaint).map((m) => [r2(m.x), m.v, m.lo, m.hi, m.ym]),
         dots: tDots, oecd: TM.oecdAvgAdj.map((r) => [r2(r.x), r.v]), edelman: TM.edelmanAvgAdj.map((r) => [r2(r.x), r.v]),
       },
-      life: lifeSat ? { series: lifeSat.series, snapshots: lifeSat.snapshots || [] } : null,
+      life: {
+        now: LM.now, latestPrint: LM.latestPrint,
+        months: LM.months.map((m) => [r2(m.x), m.v, m.lo, m.hi, m.ym]),
+        dots: lifeDots, hilda: asPrinted("hilda"), scanlon: asPrinted("scanlon"),
+      },
       terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
         .sort((a, b) => (a.e < b.e ? -1 : 1)),
       events: events.filter((e) => e.major || ["2026-02-12", "2025-12-08"].includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),

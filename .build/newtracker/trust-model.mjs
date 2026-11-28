@@ -39,7 +39,7 @@ function inv(A) { const n = A.length, M = A.map((r, i) => { const o = new Float6
 const mul = (A, B) => { const n = A.length, m = B[0].length, k = B.length, C = Array.from({ length: n }, () => new Float64Array(m)); for (let i = 0; i < n; i++) for (let l = 0; l < k; l++) { const a = A[i][l]; if (a) for (let j = 0; j < m; j++) C[i][j] += a * B[l][j]; } return C; };
 const Tr = (A) => Array.from({ length: A[0].length }, (_, j) => Float64Array.from(A, (r) => r[j]));
 function helmert(K) { const B = Array.from({ length: K }, () => new Float64Array(Math.max(0, K - 1))); for (let k = 1; k < K; k++) { const s = 1 / Math.sqrt(k * (k + 1)); for (let j = 0; j < k; j++) B[j][k - 1] = s; B[k][k - 1] = -k * s; } return B; }
-function makeRng(seed) { let s = seed >>> 0, spare = null; const u = () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; return { normal() { if (spare != null) { const v = spare; spare = null; return v; } let a, b, r; do { a = 2 * u() - 1; b = 2 * u() - 1; r = a * a + b * b; } while (r >= 1 || r === 0); const f = Math.sqrt(-2 * Math.log(r) / r); spare = b * f; return a * f; } }; }
+export function makeRng(seed) { let s = seed >>> 0, spare = null; const u = () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; return { normal() { if (spare != null) { const v = spare; spare = null; return v; } let a, b, r; do { a = 2 * u() - 1; b = 2 * u() - 1; r = a * a + b * b; } while (r >= 1 || r === 0); const f = Math.sqrt(-2 * Math.log(r) / r); spare = b * f; return a * f; } }; }
 
 function makeLayout(houses, core) {
   const coreH = houses.filter((h) => core.has(h)), other = houses.filter((h) => !core.has(h));
@@ -49,10 +49,10 @@ function makeLayout(houses, core) {
   const leanRow = new Map([...row].map(([h, v]) => { const w = Float64Array.from(v); w[0] = 0; return [h, w]; }));
   return { houses, K, N, row, leanRow };
 }
-function runFilter(obs, L, events, th, opts) {
+export function runFilter(obs, L, events, th, opts) {
   const { N, K } = L, x = new Float64Array(N); x[0] = opts.m0;
   const P = zeros(N); P[0][0] = 1;
-  for (let i = 1; i < N; i++) P[i][i] = (i < K ? th.s : WIDE) ** 2;
+  for (let i = 1; i < N; i++) P[i][i] = (opts.sd?.[i] ?? (i < K ? th.s : WIDE)) ** 2;
   const q0 = th.w ** 2, qd = th.d ** 2, tau2 = th.tau ** 2, J2 = th.J ** 2, Jp2 = th.Jp ** 2;
   const store = !!opts.store, xs = [], Ps = [], qs = [], Ph = new Float64Array(N);
   let ll = 0, prev = null, oi = 0;
@@ -75,7 +75,7 @@ function runFilter(obs, L, events, th, opts) {
   return { ll, xs, Ps, qs };
 }
 const predicted = (f, k, N) => { const Pp = f.Ps[k].map((r) => Float64Array.from(r)); const [qm, ql] = f.qs[k + 1]; Pp[0][0] += qm; for (let i = 1; i < N; i++) Pp[i][i] += ql; return Pp; };
-function smooth(f, N) {
+export function smooth(f, N) {
   const L = f.xs.length, xs = new Array(L);
   xs[L - 1] = f.xs[L - 1];
   for (let k = L - 2; k >= 0; k--) {
@@ -87,7 +87,7 @@ function smooth(f, N) {
 }
 function cholFlat(A, N, Lo) { for (let i = 0; i < N; i++) for (let j = 0; j <= i; j++) { let s = A[i * N + j]; for (let k = 0; k < j; k++) s -= Lo[i * N + k] * Lo[j * N + k]; if (i === j) Lo[i * N + i] = Math.sqrt(Math.max(s, 1e-14)); else Lo[i * N + j] = s / Lo[j * N + j]; } for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) Lo[i * N + j] = 0; }
 function cholSolveFlat(Lo, B, N, X, tmp) { for (let c = 0; c < N; c++) { for (let i = 0; i < N; i++) { let s = B[i * N + c]; for (let k = 0; k < i; k++) s -= Lo[i * N + k] * tmp[k]; tmp[i] = s / Lo[i * N + i]; } for (let i = N - 1; i >= 0; i--) { let s = tmp[i]; for (let k = i + 1; k < N; k++) s -= Lo[k * N + i] * X[k * N + c]; X[i * N + c] = s / Lo[i * N + i]; } } }
-function ffbs(f, N, nDraw, keep, rng, rec) {
+export function ffbs(f, N, nDraw, keep, rng, rec) {
   const L = f.xs.length, NN = N * N, Gf = new Float64Array(L * NN), Cf = new Float64Array(L * NN), Xf = new Float64Array(L * N);
   for (let k = 0; k < L; k++) Xf.set(f.xs[k], k * N);
   const Pf = new Float64Array(NN), Pp = new Float64Array(NN), Lc = new Float64Array(NN), X = new Float64Array(NN), cov = new Float64Array(NN), Lv = new Float64Array(NN), tmp = new Float64Array(N);
@@ -115,7 +115,7 @@ function ffbs(f, N, nDraw, keep, rng, rec) {
   }
 }
 function* gridPoints(g) { for (const w of g.w) for (const d of g.d) for (const s of g.s) for (const tau of g.tau) for (const J of g.J) for (const Jp of g.Jp) yield { w, d, s, tau, J, Jp }; }
-function allocate(rows, n) {
+export function allocate(rows, n) {
   const keep = rows.filter((r) => r.w * n >= 0.5), tot = keep.reduce((a, r) => a + r.w, 0);
   const al = keep.map((r) => ({ r, n: Math.floor((r.w / tot) * n), rem: ((r.w / tot) * n) % 1 }));
   let left = n - al.reduce((a, x) => a + x.n, 0);

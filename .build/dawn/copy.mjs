@@ -223,23 +223,21 @@ export function trustDek(M) {
   return "% saying people in government can usually or sometimes be trusted to do the right thing. " + change + ".";
 }
 
-const lifeWhen = (r) => r.field || (r.date.length === 4 ? r.date : monthYear(r.date.slice(0, 7)));
-const lifeCurrent = (M) => {
-  const s = M.life.series.find((x) => x.id === "anupoll") || M.life.series[0];
-  return { s, now: s.readings.at(-1), prev: s.readings.at(-2) };
-};
+/* life satisfaction (gen-data §5u): the estimate; "the lowest" only when the model puts today below
+   every month since then in 95% of draws. The dek's change is on the first ANUpoll wave after the
+   election (else a year earlier), a move only when its 95% interval excludes zero; ANUpoll's newest
+   print is "the lowest on file" only when no earlier wave on file prints lower */
 export function lifeHead(M) {
-  if (!M.life) return "Life satisfaction";
-  const { s, now } = lifeCurrent(M);
-  return s.house + " life satisfaction averaged " + now.v.toFixed(2) + " out of 10 in its latest wave";
+  const now = M.life.now, low = now.lowest;
+  const rank = !low ? "" : low.record ? ", the lowest on record here" : ", the lowest since " + monthYear(low.since);
+  return "Australians rate their lives " + f1(now.v) + " out of 10" + rank;
 }
 export function lifeDek(M) {
-  if (!M.life) return "";
-  const { s, now, prev } = lifeCurrent(M), delta = prev ? now.v - prev.v : null;
-  const change = delta == null ? "The first printed wave on file."
-    : Math.abs(delta) < 0.005 ? "Unchanged from " + lifeWhen(prev) + "."
-    : (delta < 0 ? "Down " : "Up ") + Math.abs(delta).toFixed(2) + " points since " + lifeWhen(prev) + ".";
-  return change + " Each survey’s mean stays on its own terms; there is no pooled score or cross-source trend.";
+  const L = M.life, E = L.now.election, C = E || L.now.year;
+  const since = E ? "since just after the " + monthYear(E.date.slice(0, 7)) + " election" : "on a year earlier";
+  const change = C.sig ? (C.chg < 0 ? "Down " : "Up ") + Math.abs(C.chg).toFixed(2) + " points " + since : "Not significantly changed " + since;
+  const P = L.latestPrint;
+  return "Estimated average life satisfaction on a 0–10 scale. " + change + ". ANUpoll’s latest wave printed " + P.v.toFixed(2) + " in " + monthYear(P.ym) + (P.lowest ? ", the lowest of any wave on file" : "") + ".";
 }
 
 /* preferred prime minister: a leader "leads" only when the 95% interval of the lead among those who

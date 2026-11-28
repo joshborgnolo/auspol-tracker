@@ -8816,15 +8816,18 @@ function infoTerms(D) {
           and nowhere else: on the OECD’s 0–10 question Australia sits above it, while other
           surveys’ questions put Australia’s level lower – a matter of wording, not rank.</span></>
           )) },
-        ...(D.lifeSat ? [{ id: "life-satisfaction", term: "Life satisfaction", body: (
-          <>The National mood section’s third view: people’s assessment of their lives as a
-          whole, not national direction or confidence in an institution. ANUpoll asks regularly,
-          while HILDA, the ABS General Social Survey and Scanlon provide slower readings.
-          <span className="info-p"><b>Keep the surveys separate.</b> Panels, age ranges and
-          modes differ, so the chart never pools them or estimates a house lean. Lines join only
-          readings from the same survey and panel; sparse sources are dots. A dot for an annual
-          survey sits at the middle of its year. DemosAU’s Life Satisfaction Score is printed on
-          its own 0–100 basis beside the 0–10 chart, never rescaled into it.</span></>) }] : []),
+        ...(D.lifeSat && D.lifeSat.model ? [{ id: "life-satisfaction", term: "Life satisfaction", body: (
+          <>The National mood section’s third view: how satisfied people are with their lives as a
+          whole, on a 0–10 scale. It isn’t about the country’s direction or trust in an
+          institution.
+          <span className="info-p"><b>How it’s built.</b> A model reads ANUpoll and the ABS
+          General Social Survey together. Each survey gets its own lean, and so does ANUpoll’s
+          earlier panel. The line is printed on ANUpoll’s current terms, with its 95% interval.
+          HILDA has barely moved while the others fell, so it is drawn as printed and left out of
+          the line. So is Scanlon, which has asked this once. In a test where each reading was
+          predicted from the ones before it, the model missed by about as much as that survey’s
+          own last reading did. Its 95% intervals held 15 of 16 readings. DemosAU’s score is out
+          of 100, so it sits with the survey notes.</span></>) }] : []),
       ] },
     { id: "s-who", title: "Who votes for whom", nav: "Who votes",
       lead: { id: "vote-by-group", body: (

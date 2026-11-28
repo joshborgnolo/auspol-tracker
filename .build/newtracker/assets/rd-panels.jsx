@@ -2378,7 +2378,7 @@ function RdDirection({ rangeId }) {
   const [view, setView] = React.useState("direction");
   if (!D.direction.length) return null;
   const hasTrust = !!(D.trustGov && D.trustGov.series && D.trustGov.series.length);
-  const hasLife = !!(D.lifeSat && D.lifeSat.series && D.lifeSat.series.length);
+  const hasLife = !!(D.lifeSat && D.lifeSat.model);
   const v = (view === "trust" && hasTrust) || (view === "life" && hasLife) ? view : "direction";
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
@@ -2410,110 +2410,169 @@ const LIFE_SAT_COLOR = {
   "abs-gss": "var(--confidence-alt)",
   scanlon: "var(--macro-cpi)",
 };
+/* how each survey enters the model, said under "How each survey asks" */
+const LIFE_ROLE_TEXT = {
+  anupoll: "The line is printed on its current panel’s terms. Its earlier Life in Australia waves count as a survey of their own, read through a lean.",
+  "abs-gss": "In the line, read through a lean of its own: it reads higher than ANUpoll, so it shows how life satisfaction moved, never where it stands.",
+  hilda: "Not in the line. It has barely moved since 2001, through a pandemic in which the other surveys fell: given its own say in how far it follows them, the data give it none. It is drawn as printed.",
+  scanlon: "Not in the line: with one reading, its lean can’t be told apart from a change. It is drawn as printed.",
+};
 function lifeWhen(s, r) {
   return r.field || (r.date.length === 4 ? r.date : trustMonth(r.date.slice(0, 7)));
 }
+/* The life satisfaction view (gen-data §5u, life-model.mjs): the trust
+   view's design on the 0–10 mean. The line is a model of the surveys that
+   move together, on ANUpoll's current panel's terms; each of their readings
+   is a dot moved onto those terms. HILDA and Scanlon aren't in it and ride
+   as printed, saying so. */
 function RdLifeSatisfaction() {
   const { D } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
-  const L = D.lifeSat;
-  const S = L.series.filter((s) => s.scaleMax === 10);
-  const ref = S.find((s) => s.id === "anupoll") || S[0];
-  const readings = ref.readings;
-  const now = readings[readings.length - 1], prev = readings[readings.length - 2];
-  const delta = prev ? now.v - prev.v : null;
-  const change = delta == null ? "The first published wave in this series."
-    : Math.abs(delta) < 0.005 ? "Unchanged from " + lifeWhen(ref, prev) + "."
-    : (delta < 0 ? "Down " : "Up ") + Math.abs(delta).toFixed(2) + " points since " + lifeWhen(ref, prev) + ".";
-  const head = ref.house + " life satisfaction is " + now.v.toFixed(2) + " out of 10";
-  const dek = change + " Each survey is published on its own terms: compare their directions, not their levels, and never blend them into one score.";
-  const lineRuns = S.filter((s) => s.role === "line").flatMap((s) => {
-    const runs = s.panels
-      ? s.panels.map((p) => ({ ...p, readings: s.readings.filter((r) => r.panel === p.id) }))
-      : [{ id: "all", readings: s.readings }];
-    return runs.filter((run) => run.readings.length >= 2).map((run, i) => ({
-      s, run, i, runs,
-    }));
-  });
-  const chartSeries = lineRuns.map(({ s, run, i, runs }) => ({
-    id: s.id + "-" + run.id,
-    label: s.house,
-    color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)",
-    points: run.readings.map((r) => ({ x: r.x, y: r.v, raw: r })),
-    rdWidth: s.id === "anupoll" ? 2.5 : 2,
-    endCap: false,
-    smooth: false,
-    endLabel: narrow || i !== runs.length - 1 ? null : s.house,
+  const L = D.lifeSat, M = L.model, now = M.now;
+  const S = Object.fromEntries(L.series.map((s) => [s.id, s]));
+  const color = LIFE_SAT_COLOR.anupoll;
+  const f2 = (v) => v.toFixed(2);
+  const pts = (n) => Math.abs(n).toFixed(2);
+  const inModel = (sid) => M.inModel.includes(sid);
+  const credit = (s, r) => ({ pollster: s.house, dateLabel: lifeWhen(s, r), sample: r.n || null });
+
+  /* ---- the window: the direction panel's machinery, over every reading */
+  const nowX = D.domain.x1;
+  const TERMS = React.useMemo(() => confTermsOf(D), [D]);
+  const curTerm = TERMS.find((t) => t.current) || TERMS[TERMS.length - 1];
+  const [winS, setWinS] = React.useState(() => confTermWin(curTerm, nowX));
+  const [dragging, setDragging] = React.useState(false);
+  const onWin = React.useCallback((w, phase) => { setWinS(w); setDragging(phase === "drag"); }, []);
+  const adjDots = Object.entries(M.adj).flatMap(([sid, rs]) => rs.map((r, i) => {
+    const s = S[sid], orig = s.readings[i];
+    return { sid, x: r.x, y: r.v, color: LIFE_SAT_COLOR[sid] || "var(--ink-3)", label: s.house + ", on ANUpoll’s terms",
+      sub: "Printed: " + r.printed, meta: credit(s, orig), hollow: orig.panel === "lia", size: 1.1 };
   }));
-  const dots = S.flatMap((s) => s.readings.map((r) => ({
-    x: r.x, y: r.v, raw: r.v,
-    color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)",
-    label: s.house,
-    hollow: s.role !== "line" || (r.panel && r.panel !== "oru"),
-    size: s.role === "line" ? 1.2 : 1.5,
-    meta: { pollster: s.house, dateLabel: lifeWhen(s, r), sample: r.n || null },
-  })));
-  const x0 = Math.floor(Math.min(...dots.map((d) => d.x)));
-  const x1 = Math.max(...dots.map((d) => d.x)) + 0.7;
-  const vals = dots.map((d) => d.y);
-  const y0 = Math.floor((Math.min(...vals) - 0.15) * 2) / 2;
-  const y1 = Math.ceil((Math.max(...vals) + 0.15) * 2) / 2;
-  const yTicks = [];
-  for (let v = y0; v <= y1 + 0.01; v += 0.5) yTicks.push(v);
-  const xTicks = [];
-  for (let y = Math.ceil(x0 / 5) * 5; y < x1; y += narrow ? 10 : 5) xTicks.push({ x: y, label: String(y) });
-  const snapshots = L.snapshots || [];
+  const other = L.series.filter((s) => !inModel(s.id));
+  const printedDots = other.filter((s) => s.role !== "line").flatMap((s) => s.readings.map((r) => ({ sid: s.id, x: r.x, y: r.v,
+    color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", label: s.house + ", as printed", meta: credit(s, r), hollow: true, size: 1.1 })));
+  const allDots = adjDots.concat(printedDots);
+  const lineAll = M.months;
+  const apart = other.filter((s) => s.role === "line");
+  const ext = { lo: Math.min(...allDots.map((d) => d.x), ...apart.flatMap((s) => s.readings.map((r) => r.x))) - 0.3, hi: nowX };
+  const vTerms = confViewTerms(TERMS, ext.lo, ext.hi);
+  const win = winS.kind === "term-carry" ? { kind: "custom", a: Math.max(ext.lo, winS.a), b: winS.b } : confClampWin(winS, vTerms, ext.lo, ext.hi, nowX);
+  const winShown = winS.kind === "term-carry" ? { ...win, kind: "term-carry", year: winS.year } : win;
+  const winTerm = win.kind === "term" ? vTerms.find((t) => t.year === win.year) : null;
+  const isCur = !!(winTerm && winTerm.current);
+  const xDomain = [win.a, win.b], xTicks = confWinTicks(win, vTerms, nowX);
+  const inW = (x) => x >= xDomain[0] - 0.05 && x <= xDomain[1] + 0.05;
+  const lineW = lineAll.filter((m) => inW(m.x));
+  const dots = allDots.filter((d) => inW(d.x));
+  const apartW = apart.map((s) => ({ s, rs: s.readings.filter((r) => inW(r.x)) }));
+  /* the keys name only what the window shows */
+  const shownApart = other.filter((s) => (s.role === "line" ? s.readings.filter((r) => inW(r.x)).length >= 2 : dots.some((d) => d.sid === s.id)));
+  const series = [
+    { id: "life-model", label: "Life satisfaction, on ANUpoll’s terms", color, points: lineW.map((m) => ({ x: m.x, y: m.v })), rdWidth: 2.5, endCap: false, smooth: false,
+      endLabel: narrow || !isCur ? null : "Estimate" },
+    ...apartW.filter((a) => a.rs.length >= 2).map(({ s, rs }) => ({ id: "life-" + s.id, label: s.house + ", as printed", color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)",
+      points: rs.map((r) => ({ x: r.x, y: r.v })), rdWidth: 1.5, dash: "4 4", endCap: false, smooth: false, interpHover: true })),
+  ];
+  const areas = lineW.length >= 2 ? [{ id: "life-ci", color, className: "ci-band", edge: false, smooth: false, points: lineW.map((m) => ({ x: m.x, y0: m.lo, y1: m.hi })) }] : [];
+  const vals = dots.map((d) => d.y).concat(areas.flatMap((a) => a.points.flatMap((p) => [p.y0, p.y1])), apartW.flatMap((a) => a.rs.map((r) => r.v)));
+  const lo = Math.floor((Math.min(...(vals.length ? vals : [6])) - 0.05) * 2) / 2, hi = Math.ceil((Math.max(...(vals.length ? vals : [7])) + 0.05) * 2) / 2;
+  const yd = useConfChase([lo, hi], dragging);
+  const elecEvs = !isCur ? confElectionEvents(win, vTerms) : [];
+  const elecRules = elecEvs.length > 6;
+  const stripLines = [{ color: "var(--ink-2)", points: lineAll.map((m) => ({ x: m.x, y: m.v })) }];
+
+  /* ---- words, each off the model's posteriors or ANUpoll's own prints ----
+     head: the estimate; "its lowest since …" only when today sits below every
+     month after it in 95% of draws (gen-data lowest). dek: the change since
+     just after the election (else on a year ago), a move only when its 95%
+     interval excludes zero; then ANUpoll's latest print, with "the lowest it
+     has published" only when no earlier wave on file prints lower. */
+  const from = M.months[0].ym;
+  const rank = !now.lowest ? "" : now.lowest.record ? ", the lowest since the line begins in " + trustMonth(from) : ", the lowest since " + trustMonth(now.lowest.since);
+  const head = "Australians rate their lives " + now.v.toFixed(1) + " out of 10" + rank;
+  const E = now.election, Y = now.year;
+  const C = E || Y;
+  const since = E ? "since just after the " + trustMonth(E.date.slice(0, 7)) + " election" : "on a year ago";
+  const sChange = C.sig ? (C.chg < 0 ? "Down " : "Up ") + pts(C.chg) + " points " + since + "." : "Not significantly changed " + since + ".";
+  const anuRs = S.anupoll.readings, last = anuRs[anuRs.length - 1];
+  const sLast = " ANUpoll’s latest wave printed " + f2(last.v) + " in " + trustMonth(last.date)
+    + (anuRs.every((r) => r.v >= last.v) ? ", the lowest of any wave on file." : ".");
+  const dek = sChange + sLast;
+  /* the scale bar runs the whole 0–10 */
+  const pc = (v) => v * 10 + "%";
+  const G = M.panelGap;
+  const names = rdList(M.inModel.map((sid) => S[sid].house));
   return (
     <>
       <RdHed head={head} dek={dek} />
       <div className="rd-dir-figs">
-        <div className="rd-dir-fig"><span className="rd-dir-v" style={{ color: LIFE_SAT_COLOR[ref.id] || "var(--ink-3)" }}>{now.v.toFixed(2)}<span className="rd-dir-pct">/10</span></span>
-          <span className="rd-dir-k" style={{ color: LIFE_SAT_COLOR[ref.id] || "var(--ink-3)" }}>{ref.house} mean life satisfaction</span></div>
-        <div className="rd-dir-fig rd-r rd-trust-meta"><span>{lifeWhen(ref, now)}</span><span>{now.n ? "n = " + now.n.toLocaleString() : ref.shortMethod || "Published national mean"}</span></div>
+        <div className="rd-dir-fig"><span className="rd-dir-v" style={{ color }}>{f2(now.v)}<span className="rd-dir-pct">/10</span></span>
+          <span className="rd-dir-k" style={{ color }}>Average life satisfaction, estimated</span></div>
+        <div className="rd-dir-fig rd-r rd-trust-meta"><span>{trustMonth(now.ym)}</span><span>95% interval {f2(now.lo)}–{f2(now.hi)}</span></div>
       </div>
+      <div className="rd-dir-bar" role="img" aria-label={`Life satisfaction ${f2(now.v)} out of 10, 95% interval ${f2(now.lo)} to ${f2(now.hi)}, ${trustMonth(now.ym)}`}>
+        <span className="rd-dir-pos" style={{ flexBasis: pc(now.lo) }}></span>
+        <span className="rd-trust-ci" style={{ flexBasis: pc(now.hi - now.lo) }}></span>
+        <span className="rd-dir-uns rd-trust-rest" style={{ flexBasis: pc(10 - now.hi) }}></span>
+      </div>
+      <p className="rd-dir-net">{E && <><b>{rdArrow(E.chg)} {pts(E.chg)} since just after the {trustMonth(E.date.slice(0, 7))} election</b>{rdSigClause(E.chg, E.pUp, E.sig)}; </>}
+        {E ? <>{rdArrow(Y.chg)} {pts(Y.chg)} on a year ago</> : <b>{rdArrow(Y.chg)} {pts(Y.chg)} on a year ago</b>}{rdSigClause(Y.chg, Y.pUp, Y.sig)}</p>
+      <RdConfWinBar win={winShown} terms={vTerms} lo={ext.lo} hi={ext.hi} nowX={nowX} onWin={onWin} />
       <div className="card rd-card rd-dir-chart rd-trust-chart rd-life-chart">
-        <div className="rd-chead"><span className="rd-chead-t">{narrow ? "Life satisfaction, mean score /10" : "Life satisfaction, mean score /10, each published survey on its own terms"}</span></div>
-        {narrow && <RdKey className="rd-tpp-legend" items={S.map((s) => ({ kind: s.role === "line" ? "line" : "dot-open", color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", label: s.house }))} />}
+        <div className="rd-chead"><span className="rd-chead-t">{narrow ? "Life satisfaction, mean out of 10" : "Life satisfaction, mean out of 10, on ANUpoll’s terms"}</span></div>
+        {narrow && <RdKey items={[{ kind: "line", color, label: "Estimate" }]} className="rd-tpp-legend" />}
         <TrendChart key="rd-life-satisfaction" heightPx={narrow ? 280 : 360}
-          padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 100, t: 40, b: 30 }}
-          xDomain={[x0, x1]} yDomain={[y0, y1]} yTicks={yTicks} yTickFmt={(v) => (v === y1 ? v.toFixed(1) + "/10" : v.toFixed(1))}
-          xTicks={xTicks} baseline series={chartSeries} scatter={dots} fmt={(v) => String(v)}
-          copy={{ title: "Life satisfaction", span: x0 + "–" + Math.floor(x1),
-            sub: head + ". Published national mean scores on 0–10 scales.",
-            caption: "Lines join readings within a survey and panel; open dots are single or differently sampled surveys. Each source retains its published level; there is no pooled score.",
-            legend: S.map((s) => ({ label: s.house, color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", kind: s.role === "line" ? "line" : "ring" })) }}
+          padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
+          xDomain={xDomain} yDomain={yd} yTicks={confTicksIn(yd, 0.5)} yTickFmt={(v) => (v === hi ? v.toFixed(1) + "/10" : v.toFixed(1))}
+          xTicks={xTicks} baseline driven={dragging}
+          series={series} spine={lineW.map((m) => ({ x: m.x, y: m.v }))} areas={areas} scatter={dots}
+          events={!isCur && !elecRules ? elecEvs : []} vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
+          tooltipTitle={(i) => (lineW[i] ? trustMonth(lineW[i].ym) : "")}
+          extraRows={(i) => { const m = lineW[i]; return m ? [{ label: "95% interval", value: f2(m.lo) + "–" + f2(m.hi), rowLabel: "life-model" }] : []; }}
+          fmt={f2}
+          copy={{ title: "Life satisfaction", span: confWinYears(win, vTerms, nowX),
+            sub: head + ". Mean on a 0–10 scale, on ANUpoll’s terms.",
+            caption: "Line: a model of " + names + ", from " + trustMonth(from) + ", shaded with its 95% interval. Dots: their readings on the same terms (open: ANUpoll’s earlier panel)." + (shownApart.length ? " " + rdList(shownApart.map((s) => s.house)) + ": as printed, not in the line." : ""),
+            legend: [{ label: "Estimate, on ANUpoll’s terms", color, kind: "line" }, ...shownApart.map((s) => ({ label: s.house + ", as printed", color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", kind: s.role === "line" ? "dash" : "ring" }))] }}
         />
-        <RdKey className="rd-ckey" items={S.map((s) => ({ kind: s.role === "line" ? "line" : "dot-open", color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", label: s.house + (s.panels ? " (open dots: Life in Australia panel)" : "") }))} />
+        <RdConfStrip lines={stripLines} lo={ext.lo} hi={ext.hi} win={win} terms={vTerms} onWin={onWin} narrow={narrow} label="Life satisfaction, on ANUpoll’s terms" />
+        <RdKey className="rd-ckey" items={[
+          { kind: "lineband", color, label: "Estimate on ANUpoll’s terms, with its 95% interval, from " + trustMonth(from) },
+          ...M.inModel.filter((sid) => dots.some((d) => d.sid === sid)).map((sid) => ({ kind: "dot", color: LIFE_SAT_COLOR[sid] || "var(--ink-3)", label: S[sid].house + (sid === "anupoll" ? " (open: its earlier panel)" : ", moved onto the same terms") })),
+          ...shownApart.map((s) => ({ kind: s.role === "line" ? "dash" : "dot-open", color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", label: s.house + ", as printed, not in the line" })),
+          elecRules ? { kind: "line", color: "var(--ink-3)", label: "A faint rule is a federal election; the strip beneath carries the governments" } : null,
+        ].filter(Boolean)} />
       </div>
+      <HowTo paras={[
+        <>The line is a model of the surveys that move together: {names}. Each asks how satisfied people are with life on a 0–10 scale, but each reads at its own level, so each gets a lean of its own, and the line is printed on the terms of ANUpoll’s current panel. It treats life satisfaction as moving a little each month, with room for a sudden shift when the pandemic was declared in March 2020. Elections get no such shift: the data don’t ask for one.</>,
+        <>ANUpoll changed panels in 2024, so its earlier waves count as a survey of their own{G ? <>. The model reads that panel as {Math.abs(G.v).toFixed(2)} points {G.v >= 0 ? "above" : "below"} the current one (95% interval {f2(G.lo)} to {f2(G.hi)}), and that doubt is why the interval is wider before the change</> : null}. Each wave also moves by more than its sample size alone would explain, so the line moves less than the waves do.</>,
+        <>HILDA follows the same households each year. It has stayed between 7.8 and 8.0 since 2001, through a pandemic in which the other surveys fell, so it isn’t measuring the same movement and is left out. Scanlon has asked this once, which says nothing about change.</>,
+        <>The shading is the line’s 95% interval: a 95% chance life satisfaction lies inside it, under the model’s assumptions. A change is called significant only when its own 95% interval excludes zero. The bar over the chart sets the window, as on the direction chart.</>,
+      ]} />
       <details className="view-how hint-how rd-dirq">
         <summary>How each survey asks</summary>
         <div className="rd-dirq-grid">
-          {S.map((s) => (
+          {L.series.map((s) => (
             <section className="rd-dirq-house" key={s.id} id={"life-" + s.id}>
               <h5 className="rd-dirq-name">{s.house} <a className="rd-link" href={s.source} target="_blank" rel="noopener noreferrer">source<span className="plink-mark">↗</span></a></h5>
               <p className="rd-dirq-q">{s.paraphrase ? s.question : "“" + s.question + "”"}</p>
               <p className="rd-dirq-l"><span className="rd-dirq-k">Answers</span>{s.answers}</p>
               <p className="rd-dirq-l"><span className="rd-dirq-k">Method</span>{s.method}</p>
+              {LIFE_ROLE_TEXT[s.id] && <p className="rd-dirq-l"><span className="rd-dirq-k">In the line</span>{LIFE_ROLE_TEXT[s.id]}</p>}
+            </section>
+          ))}
+          {(L.snapshots || []).map((s) => (
+            <section className="rd-dirq-house" key={s.id} id={"life-" + s.id}>
+              <h5 className="rd-dirq-name">{s.house} <a className="rd-link" href={s.source} target="_blank" rel="noopener noreferrer">source<span className="plink-mark">↗</span></a></h5>
+              <p className="rd-dirq-q">“{s.question}”</p>
+              <p className="rd-dirq-l"><span className="rd-dirq-k">Answers</span>{(s.distribution || []).map((r) => r.label + " " + r.v.toFixed(1) + "%").join(", ")}.</p>
+              <p className="rd-dirq-l"><span className="rd-dirq-k">Score</span>{s.v.toFixed(1)} out of 100{s.field ? ", " + s.field : ""}{s.n ? ", n = " + s.n.toLocaleString() : ""}. {s.note}</p>
+              <p className="rd-dirq-l"><span className="rd-dirq-k">In the line</span>Not in the line: it is scored out of 100.</p>
             </section>
           ))}
         </div>
       </details>
-      {snapshots.map((s) => (
-        <section className="card rd-card rd-life-snapshot" key={s.id}>
-          <div className="rd-chead"><span className="rd-chead-t">{s.house} life satisfaction, a separate 0–100 score</span></div>
-          <div className="rd-dir-figs">
-            <div className="rd-dir-fig"><span className="rd-dir-v">{s.v.toFixed(1)}<span className="rd-dir-pct">/100</span></span>
-              <span className="rd-dir-k">{s.house} Life Satisfaction Score</span></div>
-            <div className="rd-dir-fig rd-r rd-trust-meta"><span>{s.field || lifeWhen(s, s)}</span><span>{s.n ? "n = " + s.n.toLocaleString() : ""}</span></div>
-          </div>
-          <p>{s.note}</p>
-          <div className="rd-life-dist">
-            {(s.distribution || []).map((r) => <div key={r.label}><span>{r.label}</span><b>{r.v.toFixed(1)}%</b></div>)}
-          </div>
-          <p><a className="rd-link" href={s.source} target="_blank" rel="noopener noreferrer">{s.house} report and cohort breakdowns<span className="plink-mark">↗</span></a></p>
-        </section>
-      ))}
-      <RdFoot how={{ term: "life-satisfaction", from: "National mood" }}>No pooled score: the chart keeps each published mean separate. DemosAU’s 0–100 index sits outside the 0–10 chart rather than being rescaled.</RdFoot>
+      <RdFoot how={{ term: "life-satisfaction", from: "National mood" }}>These surveys come a few times a year at most: ANUpoll’s waves are irregular, HILDA’s yearly, and the General Social Survey’s years apart.</RdFoot>
     </>
   );
 }

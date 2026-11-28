@@ -27,29 +27,30 @@ try {
     await settle(900);
     const proof = await page.evaluate(() => ({
       chart: !!document.querySelector(".rd-life-chart svg"),
-      chartText: document.querySelector(".rd-life-chart")?.textContent || "",
-      snapshot: document.querySelector(".rd-life-snapshot")?.textContent || "",
-      dots: document.querySelectorAll(".rd-life-chart svg circle").length,
-      rows: window.AP.D.lifeSat.series.reduce((n, s) => n + s.readings.length, 0),
+      key: document.querySelector(".rd-life-chart")?.textContent || "",
+      cards: document.querySelectorAll("#direction .card").length,
       docW: document.documentElement.scrollWidth,
       innerW: window.innerWidth,
       heading: document.querySelector("#direction .rd-hed")?.textContent || "",
-      sourceNotes: document.querySelectorAll(".rd-dirq-house").length,
+      fig: document.querySelector("#direction .rd-dir-figs")?.textContent || "",
+      notes: document.querySelector("#direction .rd-dirq")?.textContent || "",
+      now: window.AP.D.lifeSat.model.now,
     }));
     assert.equal(errors.length, 0, `no JS error at ${width}: ${errors.join(" | ")}`);
     assert.ok(proof.chart, "the life-satisfaction chart draws");
-    assert.ok(proof.heading.includes("out of 10"), "the latest national mean heads the view");
-    assert.ok(proof.chartText.includes("ANUpoll") && proof.chartText.includes("HILDA"), "both time series are keyed");
-    assert.ok(proof.chartText.includes("ABS General Social Survey") && proof.chartText.includes("Scanlon Mapping Social Cohesion"), "sparse sources are keyed");
-    assert.ok(!proof.chartText.includes("61.5") && !proof.chartText.includes("DemosAU"), "the 0–100 snapshot never enters the 0–10 chart");
-    assert.ok(proof.snapshot.includes("DemosAU") && proof.snapshot.includes("61.5/100"), "DemosAU's snapshot retains its own 0–100 basis");
-    assert.ok(proof.snapshot.includes("Very satisfied") && proof.snapshot.includes("44.6%"), "the snapshot retains the response distribution");
-    assert.ok(proof.dots >= proof.rows, `raw reading marks draw (${proof.dots} >= ${proof.rows})`);
-    assert.equal(proof.sourceNotes, 4, "each chart source carries its own question and method note");
+    assert.equal(proof.cards, 1, "one chart card, as the other mood views");
+    assert.ok(proof.heading.includes("out of 10"), "the estimate heads the view");
+    assert.ok(proof.fig.includes(proof.now.v.toFixed(2)) && proof.fig.includes("95% interval"), "the figure carries its interval");
+    assert.ok(proof.key.includes("Estimate on ANUpoll’s terms") && !proof.key.includes("HILDA"), "this term's key names only what it shows");
+    await page.$$eval("#direction button", (els) => els.find((el) => el.textContent.trim() === "All").click());
+    await settle(900);
+    const all = await page.$eval(".rd-life-chart", (el) => el.textContent);
+    assert.ok(all.includes("HILDA, as printed, not in the line") && all.includes("Scanlon Mapping Social Cohesion, as printed, not in the line"), "All keys what is left out of the line");
+    assert.ok(!proof.key.includes("DemosAU") && proof.notes.includes("DemosAU") && proof.notes.includes("61.5 out of 100"), "DemosAU sits in the notes, off the chart");
     assert.ok(proof.docW <= proof.innerW, `no horizontal document overflow at ${width}: ${proof.docW} <= ${proof.innerW}`);
     await page.close();
   }
 } finally {
   await browser.close();
 }
-console.log("PASS: National mood Life satisfaction, separate source means and scales, responsive down to 320px");
+console.log("PASS: National mood Life satisfaction, one model line and one card, responsive down to 320px");
