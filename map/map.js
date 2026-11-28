@@ -13245,7 +13245,7 @@ function filterHTML(m) {
   const st = S.f.st || "", cls = S.f.cls || "";
   // (each label wears its bold twin, so a pressed chip never shoves its row along)
   const chip = (attr, v, on, label, sw) => `<button type="button" ${attr}="${v}" aria-pressed="${on}">${sw || ""}<span class="tw" data-t="${label}">${label}</span></button>`;
-  const states = `<div class="lg-jump lg-filter lg-row" id="state-filters" role="group" aria-label="Filter by state or territory"><b>State</b>${chip("data-state", "", !st, "All")}${CITIES.map(([, s2]) => chip("data-state", s2, st === s2, STATE_ABBR[s2] || s2)).join("")}</div>`;
+  const states = `<div class="lg-jump lg-filter lg-row" id="state-filters" role="group" aria-label="Filter by state or territory"><b>State/territory</b>${chip("data-state", "", !st, "All")}${CITIES.map(([, s2]) => chip("data-state", s2, st === s2, STATE_ABBR[s2] || s2)).join("")}</div>`;
   const kinds = CLS.map((c, k) => [c, k]).filter(([c]) => m.divs.some((d) => d.cls === c));
   const types = kinds.length ? `<div class="lg-jump lg-filter lg-typefilter lg-row" id="type-filters" role="group" aria-label="Filter by seat type"><b>Seat type</b>${chip("data-cls", "", !cls, "All")}${kinds.map(([c, k]) => chip("data-cls", c, cls === c, esc(CLS_SHORT[c]), S.lens === "cls" ? `<i style="background:${css(TH.cls[k])}"></i>` : "")).join("")}</div>` : "";
   return states + types;
@@ -13259,7 +13259,7 @@ if (panelMQ.addEventListener) panelMQ.addEventListener("change", () => { if (M()
 function compactPanelHTML(m) {
   const pairs = [];
   if (!STATE_YEARS.has(m.year)) {
-    pairs.push(["State", lgMenu("fst", [["", "All"], ...CITIES.map(([, st]) => [st, STATE_ABBR[st] || st])], S.f.st || "", "Filter by state or territory")]);
+    pairs.push(["State/territory", lgMenu("fst", [["", "All"], ...CITIES.map(([, st]) => [st, STATE_ABBR[st] || st])], S.f.st || "", "Filter by state or territory")]);
     const kinds = CLS.filter((c) => m.divs.some((d) => d.cls === c));
     if (kinds.length) pairs.push(["Seat type", lgMenu("fcls", [["", "All"], ...kinds.map((c) => [c, CLS_SHORT[c]])], S.f.cls || "", "Filter by seat type")]);
   }

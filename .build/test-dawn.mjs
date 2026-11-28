@@ -816,6 +816,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   /* the map is /map/'s own engine, in Dawn's dress, with the page's menus and rows around it */
   ok(/classList\.add\('mp-dawn'\)/.test(built) && /<script src="\/map\/map\.js\?v=[0-9a-f]{8}"><\/script>/.test(built) && /href="\/map\/map\.css\?v=[0-9a-f]{8}"/.test(built), "electoral map: runs the full map's own script and styles");
   for (const id of ["dm-year", "dm-basis", "dm-opts", "dm-filters", "dm-places", "dm-draw", "stage", "cv", "story", "legend", "dm-notes", "q", "sugg"]) ok(built.includes(`id="${id}"`), `electoral map: #${id}`);
+  ok(built.includes('id="dm-hint">Tap a seat on the map, or a seat type or state or territory above, to read it here.'), "electoral map: the hint covers seats, seat types and states or territories");
   /* big screens: the square map, and the figures in the column beside it. The script that moves them asks the stylesheet's question */
   const big = "(min-width:1100px) and (min-height:600px)";
   ok(built.includes(`@media ${big}{`) && built.includes(`matchMedia('${big}')`), "electoral map: the layout and the script switch on the same screens");
