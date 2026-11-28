@@ -843,7 +843,7 @@ function chart(o){
        only a name with room on neither row falls back to the party. A phone has the shading alone: names
        stacked three rows deep couldn't be matched to their terms */
     let GV=[];const GVF=11.5;
-    if(S.govs&&!evs.length){const fz=`500 ${GVF}px`,gap=8,rows=[[],[],[]];
+    if(S.govs&&(!evs.length||S.govShade)){const fz=`500 ${GVF}px`,gap=8,rows=[[],[],[]];
       const free=(r,a,b)=>rows[r].every(([p,q])=>b+gap<=p||a>=q+gap);
       /* each government's prime ministers: inside its term where they fit; the rest, narrowest term first,
          beside their term on the lowest row with room; the party only where no row has */
@@ -856,7 +856,8 @@ function chart(o){
       /* nearest free spot along the lowest row that still overlaps the term: the shortest full form, then the first prime minister, then the party */
       B.filter(v=>!v.nm).sort((u,v)=>(u.gb-u.ga)-(v.gb-v.ga)).forEach(v=>{place(v,v.c.slice().sort((a,b)=>tw(a,fz)-tw(b,fz)))||place(v,[v.g.pms[0]])||place(v,[v.g.gov==='alp'?'Labor':'Coalition'])});
       GV=B;
-      if(W<600)B.forEach(v=>v.nm='');else EVH=22+14*Math.max(0,...GV.filter(v=>v.nm).map(v=>v.r))}
+      if(evs.length)B.forEach(v=>v.nm='');
+      else if(W<600)B.forEach(v=>v.nm='');else EVH=22+14*Math.max(0,...GV.filter(v=>v.nm).map(v=>v.r))}
     const MT=TIPH+EVH+(evs.length&&!narrow?8:0),MB=24,PH=H-MT-MB,y=v=>MT+PH*(S.y1-v)/(S.y1-S.y0);
     let s='';
     GV.forEach(({g,ga,gb,nm,r,cx})=>{const col=`var(--${g.gov==='alp'?'alp':'lnp'})`;
@@ -1081,8 +1082,8 @@ function dirScene(narrow){
     if(dots)for(const r of DATA.pastPolls){const x=isoX(r[0]);if(x<a||x>b)continue;dot(x,r[2],r[3],r[4],poll(r[0]+'|'+r[1],r[1],fdate(r[0]),''))}
     if(!cur)S.ends=[];
   }
-  if(span>8)S.govs=govBlocks(a,b);
-  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
+  S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   axis(S,[...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(q=>q.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...(S.lines.length?[]:[30,50])],10);
   return S;
 }
@@ -1114,8 +1115,8 @@ function trustScene(){
     S.stops.push({x:m.x,label:ymWords(m.ym),sub:ev?ev.s:'',items})}
   const last=M[M.length-1];
   if(cur&&inW(last.x)){S.ends=[{color:TC,y:last.y,name:'Trust',abbr:'Trust',v:last.y}];S.endX=last.x}
-  if(span>8)S.govs=govBlocks(a,b);
-  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
+  S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const shown=S.bands.flatMap(q=>q.pts.filter(p=>inW(p.x)).flatMap(p=>[p.lo,p.hi]));
   axis(S,[...shown,...S.dots.map(d=>d.y),...extras.flatMap(e=>e.pts.filter(p=>inW(p.x)).map(p=>p.y)),...(shown.length?[]:[20,40])],10);
   return S;
@@ -1145,8 +1146,8 @@ function lifeScene(){
     S.stops.push({x:m.x,label:ymWords(m.ym),sub:ev?ev.s:'',items})}
   const last=M[M.length-1];
   if(cur&&inW(last.x)){S.ends=[{color:TC,y:last.y,name:'Estimate',abbr:'Est.',v:last.y}];S.endX=last.x}
-  if(span>8)S.govs=govBlocks(a,b);
-  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
+  S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const shown=[...S.bands.flatMap(q=>q.pts.filter(p=>inW(p.x)).flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...hp.filter(p=>inW(p.x)).map(p=>p.y)];
   const ys=shown.length?shown:[6,7];
   S.y0=Math.floor((Math.min(...ys)-.05)*2)/2;S.y1=Math.ceil((Math.max(...ys)+.05)*2)/2;
@@ -1304,6 +1305,7 @@ function cohesionScene(){
   }
   S.endX=S.x1;S.y0=Math.floor((Math.min(...values)-1)/S.ys)*S.ys;S.y1=Math.ceil((Math.max(...values)+1)/S.ys)*S.ys;
   S.tick=v=>String(v)+(isIndex?'':'%');S.fmt=v=>isIndex?String(v):f1(v)+'%';
+  S.events=winEvents(S.x0,S.x1,S.x0>=CUR.a-1e-6);
   return S;
 }
 const cohesionChart=chart({fig:$('#cohesion-fig'),svg:$('#cohesion-svg'),scene:cohesionScene,use:()=>{WIN={kind:'all'};HIST.terms[0].a=view.value==='index'?C.scanlon[0][0]:isoX(C.sec[0][0]+'-15')}});

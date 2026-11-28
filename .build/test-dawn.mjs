@@ -323,6 +323,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(settledWhisk.delta, 7, "a settled half-width snaps to a whole tenth");
   eq(settledWhisk.sr, "±0.7 percentage points, 95% credible interval", "the settled figure names the snapped tenth");
   const C = copyFor(D0);
+  eq((html.match(/S\.govShade=1/g) || []).length, 2, "the primary and 2PP scenes both retain government shading under long-window events");
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
   ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed, under preference-flow assumptions"), "the two-party explanatory dek names its preference-flow assumptions");
   ok(html.includes(".flow-match h3{margin:0 0 10px;font:500 19.5px var(--sans);color:var(--mute)}") && html.includes(".flow-phone-title{margin:0 0 10px;font:500 19.5px var(--sans)}"), "the Sankey margin heading is 1.5× its former 13px size on both layouts");
@@ -580,6 +581,11 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]).asOf, M0.asOf, "mood: its data parses");
   new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
   ok([moodHead(M0), moodDek(M0), trustHead(M0), trustDek(M0), lifeHead(M0), lifeDek(M0)].every((w) => built.includes(w)), "mood: its words are today's rules");
+  ok(built.includes('id="life-svg"') && built.includes("wLife=windowedChart"), "mood: life satisfaction has its own chart window");
+  eq((built.match(/S\.govShade=1/g) || []).length, 3, "direction, trust and life satisfaction opt into retained government shading under long-window events");
+  ok(built.includes("S.events=winEvents("), "mood: every long-range mood view has event data, including cohesion's all-history view");
+  ok(built.includes("S.govs&&(!evs.length||S.govShade)"), "the shared renderer can preserve government fills under event rules");
+  ok(built.includes("if(evs.length)B.forEach(v=>v.nm='')"), "government names yield to event names when both would collide");
   ok(/name="robots" content="noindex"/.test(built), "mood: unlisted");
   ok(built.includes("direct:true};") && built.includes("q:'?facet=direction'"), "mood: a pressed dot opens its poll on the Direction view");
   const rows = new Set(JSON.parse(fs.readFileSync(path.join(A, "dawn-polls.json"), "utf8")).polls.map((p) => p.k));

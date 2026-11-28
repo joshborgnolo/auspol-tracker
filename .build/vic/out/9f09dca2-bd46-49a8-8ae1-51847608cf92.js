@@ -164,7 +164,6 @@ window.AUSPOL = (function () {
   const directionStateNote = null;
   /* §5t: trust in the federal government, hand-filed, never pooled */
   const trustGov = null;
-  const lifeSat = null;
   const directionHouseEffects = {"right":{},"wrong":{},"net":{}};
   /* Ipsos' Global Average moved onto the panel's terms by Ipsos's lean on
      each wave's day (§5m), the main chart's dashed reference; null on /vic/ */
@@ -451,7 +450,7 @@ window.AUSPOL = (function () {
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = null;
   /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
-  const seatModel = {"headline":"The Coalition is likely to win a majority","pollsTo":"2026-11-25","draws":20000,"expectedSeats":{"alp":23.48,"lnp":49.01,"on":6.75,"grn":7.86,"oth":0,"member":0.9},"mostSeats":{"alp":0.0232,"lnp":0.97,"on":0.0068,"grn":0,"oth":0,"member":0},"majority":{"alp":0.0024,"coalition":0.7471,"on":0.0023,"noMajority":0.2483}};
+  const seatModel = {"headline":"The Coalition is likely to win a majority","pollsTo":"2026-11-25","draws":20000,"expectedSeats":{"alp":23.97,"lnp":48.89,"on":6.72,"grn":7.56,"oth":0,"member":0.86},"mostSeats":{"alp":0.0261,"lnp":0.9672,"on":0.0068,"grn":0,"oth":0,"member":0},"majority":{"alp":0.0031,"coalition":0.7406,"on":0.0023,"noMajority":0.2542}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -494,7 +493,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, pubLine, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, lifeSat, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, pubLine, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {
