@@ -18,12 +18,28 @@ const charts = [
     votes: [[25.7,32.6],[26.2,16.5],[24.8,24.7],[13.1,16.7]] },
 ];
 
-function finding({ id, subject, baseline, votes }, index) {
+// Both bars start at zero. Keep the same scale when switching comparisons.
+const scaleMax = Math.ceil(Math.max(...charts.flatMap(chart => chart.votes.flat())) / 10) * 10;
+const partyKeys = ["alp", "onp", "lnp", "grn"];
+
+function finding({ id, groups, subject, baseline, votes }, index) {
   const differences = votes.map((shares, i) => ({
-    party: parties[i], gap: shares.at(-1) - shares[0], ratio: shares.at(-1) / shares[0],
+    party: parties[i], key: partyKeys[i], first: shares[0], last: shares.at(-1),
+    gap: shares.at(-1) - shares[0], ratio: shares.at(-1) / shares[0],
   })).sort((a, b) => b.gap - a.gap);
   const high = differences[0], low = differences.at(-1);
-  return `<p id="finding-${id}" class="finding"${index ? " hidden" : ""}>${subject} are <strong>${high.ratio.toFixed(1)} times</strong> as likely as ${baseline} to back ${high.party}, but only <strong>${low.ratio.toFixed(2)} times</strong> as likely to back ${low.party}.</p>`;
+  const rows = differences.toSorted((a, b) => Math.abs(b.gap) - Math.abs(a.gap)).map(p => {
+    const bars = [p.first, p.last].map((value, i) =>
+      `<span class="bar-line"><i class="bar ${i ? 'solid' : 'hatched'}" style="width:${100 * value / scaleMax}%"></i><b>${value.toFixed(1)}%</b></span>`
+    ).join("");
+    const label = p.party.replace(/^the /, "");
+    return `<div class="party-row ${p.key}" role="img" aria-label="${label}. ${groups[0]}: ${p.first}%. ${groups.at(-1)}: ${p.last}%."><span class="party-label">${label}</span><span class="bar-pair">${bars}</span></div>`;
+  }).join("");
+  return `<div id="finding-${id}" class="finding"${index ? " hidden" : ""}>
+    <div class="bar-key"><span><i class="hatched"></i>${groups[0]}</span><span><i class="solid"></i>${groups.at(-1)}</span></div>
+    <div class="party-plot">${rows}</div>
+    <p>${subject} are <strong>${high.ratio.toFixed(1)} times</strong> as likely as ${baseline} to back ${high.party}, but <strong>${low.ratio.toFixed(2)} times</strong> as likely to back ${low.party}.</p>
+  </div>`;
 }
 
 function panel({ id, label, groups, votes }) {
