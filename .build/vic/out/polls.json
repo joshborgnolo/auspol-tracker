@@ -128,7 +128,7 @@
   },
   "meta": {
     "source": "data/vic-polls.json",
-    "generated": "2026-11-27"
+    "generated": "2026-11-28"
   },
   "metricRules": {
     "favFirms": [
@@ -1651,6 +1651,23 @@
       "tpp_lnp": 57.5,
       "url": "https://www.theaustralian.com.au/nation/politics/jess-wilson-opens-15point-newspoll-lead-as-victorian-labor-collapses/news-story/b8962613a919752e3d789fd8f1bec001",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/29512006/VictoriaNewspollMethodologyStatement26November2026byPyxis-OMSin1nZ6H_eB077oxzm2g.pdf"
+    },
+    {
+      "date": "2026-11-26",
+      "dateStart": "2026-11-23",
+      "pollster": "Freshwater",
+      "client": "Herald Sun",
+      "sample": 1026,
+      "alp": 21,
+      "lnp": 34,
+      "grn": 15,
+      "onp": 23,
+      "ind": 7,
+      "oth": null,
+      "tpp_alp": 42,
+      "tpp_lnp": 58,
+      "url": "https://www.pollbludger.net/2026/11/28/victorian-election-late-polling/",
+      "releaseUrl": "https://www.heraldsun.com.au/news/victoria/state-election/final-victorian-election-polls-show-coalition-on-track-to-form-majority-government/news-story/b458264b2534bc9c8be90ab8ccf39584"
     }
   ],
   "ppm": [
@@ -2142,6 +2159,16 @@
       "oppName": "Wilson",
       "pmName": "Carroll",
       "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-11-26",
+      "firm": "Freshwater",
+      "alb": 27,
+      "opp": 43,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 17,
       "extra": null
     }
   ],

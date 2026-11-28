@@ -1,8 +1,8 @@
 {
-  "generated": "2026-11-27",
+  "generated": "2026-11-28",
   "sources": {
-    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-27 snapshot)",
-    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-27 snapshot)",
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-28 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-28 snapshot)",
     "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
   },
   "polls": [
@@ -2257,6 +2257,34 @@
       ],
       "sourceUrl": "https://www.theaustralian.com.au/nation/politics/jess-wilson-opens-15point-newspoll-lead-as-victorian-labor-collapses/news-story/b8962613a919752e3d789fd8f1bec001",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/29512006/VictoriaNewspollMethodologyStatement26November2026byPyxis-OMSin1nZ6H_eB077oxzm2g.pdf"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1026,
+      "dateLabel": "23–26 Nov 2026",
+      "fwStart": "2026-11-23",
+      "fwEnd": "2026-11-26",
+      "approxDate": false,
+      "primary": {
+        "alp": 21,
+        "lnp": 34,
+        "grn": 15,
+        "onp": 23,
+        "ind": null,
+        "oth": 7
+      },
+      "tpp2": {
+        "alp": 42
+      },
+      "alt": {},
+      "provenance": [
+        "pollbludger",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.pollbludger.net/2026/11/28/victorian-election-late-polling/",
+      "releaseUrl": "https://www.heraldsun.com.au/news/victoria/state-election/final-victorian-election-polls-show-coalition-on-track-to-form-majority-government/news-story/b458264b2534bc9c8be90ab8ccf39584"
     }
   ],
   "threeParty": [
@@ -4621,6 +4649,28 @@
       "provenance": [
         "newspoll",
         "pollbludger"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "23–26 Nov 2026",
+      "date": "2026-11-26",
+      "fwStart": "2026-11-23",
+      "firm": "freshwater",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1026,
+      "values": {
+        "carroll": 27,
+        "wilson": 43,
+        "pickering": 17
+      },
+      "dk": 13,
+      "net": 16,
+      "sourceUrl": "https://poltrends.stewartmedia.com.au/victoria.html",
+      "releaseUrl": "https://www.heraldsun.com.au/news/victoria/state-election/final-victorian-election-polls-show-coalition-on-track-to-form-majority-government/news-story/b458264b2534bc9c8be90ab8ccf39584",
+      "provenance": [
+        "wikipedia",
+        "poltrends"
       ]
     },
     {
