@@ -4,16 +4,16 @@ const charts = [
   { id: "generation", label: "Generation", subject: "Boomers", baseline: "Gen Z voters",
     groups: ["Gen Z", "Millennials", "Gen X", "Boomers"],
     votes: [[28.8,28.1,25.7,26.6],[11.2,23.2,29.8,29.1],[15.2,20.8,25.3,31.4],[33.6,17,8.6,4]] },
-  { id: "age", label: "Age group", subject: "Over-55s", baseline: "18–34-year-olds",
+  { id: "age", label: "Age group", subject: "voters aged 55+", baseline: "18–34-year-olds",
     groups: ["18–34", "35–54", "55+"],
     votes: [[29.5,27.6,24.5],[15.7,25.7,30],[18.2,22.8,30.5],[26.8,12.8,5]] },
-  { id: "education", label: "Education", subject: "University graduates", baseline: "voters without post-school education",
+  { id: "education", label: "Education", subject: "university graduates", baseline: "voters without post-school education",
     groups: ["Year 12 or less", "TAFE or trade", "University"],
     votes: [[24.9,25.4,31],[28.2,28.8,15.7],[24.5,23,26.9],[13.6,11.4,15.7]] },
-  { id: "seat-type", label: "Seat type", subject: "Voters in rural seats", baseline: "those in inner metro seats",
+  { id: "seat-type", label: "Seat type", subject: "voters in rural seats", baseline: "inner metro voters",
     groups: ["Inner metro", "Outer metro", "Provincial", "Rural"],
     votes: [[29,31.2,29.5,18.3],[17.1,24.6,26.5,31.4],[25.1,22.8,23.6,27.7],[18.3,12.4,13,9.2]] },
-  { id: "language", label: "Language at home", subject: "Voters who speak another language at home", baseline: "those who speak only English",
+  { id: "language", label: "Language at home", subject: "those who speak another language", baseline: "voters who speak only English at home",
     groups: ["English only", "Other language"],
     votes: [[25.7,32.6],[26.2,16.5],[24.8,24.7],[13.1,16.7]] },
 ];
@@ -28,6 +28,8 @@ function finding({ id, groups, subject, baseline, votes }, index) {
     gap: shares.at(-1) - shares[0], ratio: shares.at(-1) / shares[0],
   })).sort((a, b) => b.gap - a.gap);
   const high = differences[0], low = differences.at(-1);
+  const likelihood = p => p.ratio >= 2 ? `${p.ratio.toFixed(1)} times as likely`
+    : `${Math.round(Math.abs(p.ratio - 1) * 100)}% ${p.gap > 0 ? "more" : "less"} likely`;
   const rows = differences.toSorted((a, b) => Math.abs(b.gap) - Math.abs(a.gap)).map(p => {
     const bars = [p.first, p.last].map((value, i) =>
       `<span class="bar-line"><i class="bar ${i ? 'solid' : 'hatched'}" style="width:${100 * value / scaleMax}%"></i><b>${value.toFixed(1)}%</b></span>`
@@ -38,7 +40,10 @@ function finding({ id, groups, subject, baseline, votes }, index) {
   return `<div id="finding-${id}" class="finding"${index ? " hidden" : ""}>
     <div class="bar-key"><span><i class="hatched"></i>${groups[0]}</span><span><i class="solid"></i>${groups.at(-1)}</span></div>
     <div class="party-plot">${rows}</div>
-    <p>${subject} are <strong>${high.ratio.toFixed(1)} times</strong> as likely as ${baseline} to back <span class="party-name ${high.key}">${high.party}</span>, but <strong>${low.ratio.toFixed(2)} times</strong> as likely to back <span class="party-name ${low.key}">${low.party}</span>.</p>
+    <div class="takeaway">
+      <p class="takeaway-context">Compared with ${baseline}, ${subject} are</p>
+      <ul>${[high, low].map(p => `<li><strong>${likelihood(p)}</strong> to back <span class="party-name ${p.key}">${p.party}</span></li>`).join("")}</ul>
+    </div>
   </div>`;
 }
 

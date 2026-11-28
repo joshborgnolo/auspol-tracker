@@ -337,7 +337,12 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .facets button{font:600 14px var(--sans);padding:7px 11px;border:1px solid #ffffff75;color:inherit;border-radius:24px;background:#0b193755;cursor:pointer}
 .facets button[aria-pressed=true]{color:#101b38;background:#f6f4ff}
 .finding{max-width:540px}
-.finding p{font:400 clamp(18px,2.7vh,24px)/1.22 var(--serif);margin:14px 0 0;max-width:41ch}
+.takeaway{margin-top:clamp(10px,2vh,20px)}
+.takeaway-context{margin:0 0 5px;max-width:54ch;font:500 clamp(14px,1.9vh,16px)/1.35 var(--sans);text-wrap:pretty}
+.takeaway ul{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+.takeaway li{font:400 clamp(18px,min(5.2vw,2.9vh),25px)/1.2 var(--serif)}
+.takeaway strong{font-weight:600;white-space:nowrap}
+.takeaway .party-name{white-space:nowrap}
 .finding .party-name.alp{color:var(--alp)}
 .finding .party-name.onp{color:var(--on)}
 .finding .party-name.lnp{color:var(--lnp)}
@@ -355,7 +360,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .bar-line{display:flex;align-items:center;height:16px}
 .bar{height:8px;flex-shrink:0}
 .bar-line b{margin-left:5px;font:600 13px/1 var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap}
-@media(max-height:650px){.facets{margin:6px 0}.party-row{padding:3px 0}.finding p{margin-top:6px}}
+@media(max-height:650px){.facets{margin:6px 0}.party-row{padding:3px 0}.takeaway{margin-top:6px}}
 @media(max-height:520px){.hero{height:auto;min-height:100lvh;padding:calc(var(--navh) + 12px) var(--g) 32px}.hero .now{position:relative;inset:auto;width:auto}}
 .chart-link{display:block;min-height:0;flex:1;margin:14px 0;text-align:center}
 .chart-link img{width:100%;height:100%;object-fit:contain;object-position:top left}
@@ -420,27 +425,42 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <div aria-live="polite"><div id="finding-generation" class="finding">
     <div class="bar-key"><span><i class="hatched"></i>Gen Z</span><span><i class="solid"></i>Boomers</span></div>
     <div class="party-plot"><div class="party-row grn" role="img" aria-label="Greens. Gen Z: 33.6%. Boomers: 4%."><span class="party-label">Greens</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:84%"></i><b>33.6%</b></span><span class="bar-line"><i class="bar solid" style="width:10%"></i><b>4.0%</b></span></span></div><div class="party-row onp" role="img" aria-label="One Nation. Gen Z: 11.2%. Boomers: 29.1%."><span class="party-label">One Nation</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:28%"></i><b>11.2%</b></span><span class="bar-line"><i class="bar solid" style="width:72.75%"></i><b>29.1%</b></span></span></div><div class="party-row lnp" role="img" aria-label="Coalition. Gen Z: 15.2%. Boomers: 31.4%."><span class="party-label">Coalition</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:38%"></i><b>15.2%</b></span><span class="bar-line"><i class="bar solid" style="width:78.5%"></i><b>31.4%</b></span></span></div><div class="party-row alp" role="img" aria-label="Labor. Gen Z: 28.8%. Boomers: 26.6%."><span class="party-label">Labor</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:72%"></i><b>28.8%</b></span><span class="bar-line"><i class="bar solid" style="width:66.5%"></i><b>26.6%</b></span></span></div></div>
-    <p>Boomers are <strong>2.6 times</strong> as likely as Gen Z voters to back <span class="party-name onp">One Nation</span>, but <strong>0.12 times</strong> as likely to back <span class="party-name grn">the Greens</span>.</p>
+    <div class="takeaway">
+      <p class="takeaway-context">Compared with Gen Z voters, Boomers are</p>
+      <ul><li><strong>2.6 times as likely</strong> to back <span class="party-name onp">One Nation</span></li><li><strong>88% less likely</strong> to back <span class="party-name grn">the Greens</span></li></ul>
+    </div>
   </div>
 <div id="finding-age" class="finding" hidden>
     <div class="bar-key"><span><i class="hatched"></i>18–34</span><span><i class="solid"></i>55+</span></div>
     <div class="party-plot"><div class="party-row grn" role="img" aria-label="Greens. 18–34: 26.8%. 55+: 5%."><span class="party-label">Greens</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:67%"></i><b>26.8%</b></span><span class="bar-line"><i class="bar solid" style="width:12.5%"></i><b>5.0%</b></span></span></div><div class="party-row onp" role="img" aria-label="One Nation. 18–34: 15.7%. 55+: 30%."><span class="party-label">One Nation</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:39.25%"></i><b>15.7%</b></span><span class="bar-line"><i class="bar solid" style="width:75%"></i><b>30.0%</b></span></span></div><div class="party-row lnp" role="img" aria-label="Coalition. 18–34: 18.2%. 55+: 30.5%."><span class="party-label">Coalition</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:45.5%"></i><b>18.2%</b></span><span class="bar-line"><i class="bar solid" style="width:76.25%"></i><b>30.5%</b></span></span></div><div class="party-row alp" role="img" aria-label="Labor. 18–34: 29.5%. 55+: 24.5%."><span class="party-label">Labor</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:73.75%"></i><b>29.5%</b></span><span class="bar-line"><i class="bar solid" style="width:61.25%"></i><b>24.5%</b></span></span></div></div>
-    <p>Over-55s are <strong>1.9 times</strong> as likely as 18–34-year-olds to back <span class="party-name onp">One Nation</span>, but <strong>0.19 times</strong> as likely to back <span class="party-name grn">the Greens</span>.</p>
+    <div class="takeaway">
+      <p class="takeaway-context">Compared with 18–34-year-olds, voters aged 55+ are</p>
+      <ul><li><strong>91% more likely</strong> to back <span class="party-name onp">One Nation</span></li><li><strong>81% less likely</strong> to back <span class="party-name grn">the Greens</span></li></ul>
+    </div>
   </div>
 <div id="finding-education" class="finding" hidden>
     <div class="bar-key"><span><i class="hatched"></i>Year 12 or less</span><span><i class="solid"></i>University</span></div>
     <div class="party-plot"><div class="party-row onp" role="img" aria-label="One Nation. Year 12 or less: 28.2%. University: 15.7%."><span class="party-label">One Nation</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:70.5%"></i><b>28.2%</b></span><span class="bar-line"><i class="bar solid" style="width:39.25%"></i><b>15.7%</b></span></span></div><div class="party-row alp" role="img" aria-label="Labor. Year 12 or less: 24.9%. University: 31%."><span class="party-label">Labor</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:62.25%"></i><b>24.9%</b></span><span class="bar-line"><i class="bar solid" style="width:77.5%"></i><b>31.0%</b></span></span></div><div class="party-row lnp" role="img" aria-label="Coalition. Year 12 or less: 24.5%. University: 26.9%."><span class="party-label">Coalition</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:61.25%"></i><b>24.5%</b></span><span class="bar-line"><i class="bar solid" style="width:67.25%"></i><b>26.9%</b></span></span></div><div class="party-row grn" role="img" aria-label="Greens. Year 12 or less: 13.6%. University: 15.7%."><span class="party-label">Greens</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:34%"></i><b>13.6%</b></span><span class="bar-line"><i class="bar solid" style="width:39.25%"></i><b>15.7%</b></span></span></div></div>
-    <p>University graduates are <strong>1.2 times</strong> as likely as voters without post-school education to back <span class="party-name alp">Labor</span>, but <strong>0.56 times</strong> as likely to back <span class="party-name onp">One Nation</span>.</p>
+    <div class="takeaway">
+      <p class="takeaway-context">Compared with voters without post-school education, university graduates are</p>
+      <ul><li><strong>24% more likely</strong> to back <span class="party-name alp">Labor</span></li><li><strong>44% less likely</strong> to back <span class="party-name onp">One Nation</span></li></ul>
+    </div>
   </div>
 <div id="finding-seat-type" class="finding" hidden>
     <div class="bar-key"><span><i class="hatched"></i>Inner metro</span><span><i class="solid"></i>Rural</span></div>
     <div class="party-plot"><div class="party-row onp" role="img" aria-label="One Nation. Inner metro: 17.1%. Rural: 31.4%."><span class="party-label">One Nation</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:42.75000000000001%"></i><b>17.1%</b></span><span class="bar-line"><i class="bar solid" style="width:78.5%"></i><b>31.4%</b></span></span></div><div class="party-row alp" role="img" aria-label="Labor. Inner metro: 29%. Rural: 18.3%."><span class="party-label">Labor</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:72.5%"></i><b>29.0%</b></span><span class="bar-line"><i class="bar solid" style="width:45.75%"></i><b>18.3%</b></span></span></div><div class="party-row grn" role="img" aria-label="Greens. Inner metro: 18.3%. Rural: 9.2%."><span class="party-label">Greens</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:45.75%"></i><b>18.3%</b></span><span class="bar-line"><i class="bar solid" style="width:22.999999999999996%"></i><b>9.2%</b></span></span></div><div class="party-row lnp" role="img" aria-label="Coalition. Inner metro: 25.1%. Rural: 27.7%."><span class="party-label">Coalition</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:62.75%"></i><b>25.1%</b></span><span class="bar-line"><i class="bar solid" style="width:69.25%"></i><b>27.7%</b></span></span></div></div>
-    <p>Voters in rural seats are <strong>1.8 times</strong> as likely as those in inner metro seats to back <span class="party-name onp">One Nation</span>, but <strong>0.63 times</strong> as likely to back <span class="party-name alp">Labor</span>.</p>
+    <div class="takeaway">
+      <p class="takeaway-context">Compared with inner metro voters, voters in rural seats are</p>
+      <ul><li><strong>84% more likely</strong> to back <span class="party-name onp">One Nation</span></li><li><strong>37% less likely</strong> to back <span class="party-name alp">Labor</span></li></ul>
+    </div>
   </div>
 <div id="finding-language" class="finding" hidden>
     <div class="bar-key"><span><i class="hatched"></i>English only</span><span><i class="solid"></i>Other language</span></div>
     <div class="party-plot"><div class="party-row onp" role="img" aria-label="One Nation. English only: 26.2%. Other language: 16.5%."><span class="party-label">One Nation</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:65.5%"></i><b>26.2%</b></span><span class="bar-line"><i class="bar solid" style="width:41.25%"></i><b>16.5%</b></span></span></div><div class="party-row alp" role="img" aria-label="Labor. English only: 25.7%. Other language: 32.6%."><span class="party-label">Labor</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:64.25%"></i><b>25.7%</b></span><span class="bar-line"><i class="bar solid" style="width:81.5%"></i><b>32.6%</b></span></span></div><div class="party-row grn" role="img" aria-label="Greens. English only: 13.1%. Other language: 16.7%."><span class="party-label">Greens</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:32.75%"></i><b>13.1%</b></span><span class="bar-line"><i class="bar solid" style="width:41.75%"></i><b>16.7%</b></span></span></div><div class="party-row lnp" role="img" aria-label="Coalition. English only: 24.8%. Other language: 24.7%."><span class="party-label">Coalition</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:62%"></i><b>24.8%</b></span><span class="bar-line"><i class="bar solid" style="width:61.75%"></i><b>24.7%</b></span></span></div></div>
-    <p>Voters who speak another language at home are <strong>1.3 times</strong> as likely as those who speak only English to back <span class="party-name alp">Labor</span>, but <strong>0.63 times</strong> as likely to back <span class="party-name onp">One Nation</span>.</p>
+    <div class="takeaway">
+      <p class="takeaway-context">Compared with voters who speak only English at home, those who speak another language are</p>
+      <ul><li><strong>27% more likely</strong> to back <span class="party-name alp">Labor</span></li><li><strong>37% less likely</strong> to back <span class="party-name onp">One Nation</span></li></ul>
+    </div>
   </div></div>
   </div>
 </section>
