@@ -427,7 +427,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <div class="now" id="now">
     <h1>Demographics</h1>
     <p class="now-d">Estimated first preferences · November 2026</p>
-    <div class="facets" role="group" aria-label="Compare voters by demographic"><button type="button" aria-pressed="true" aria-controls="finding-generation">Generation</button><button type="button" aria-pressed="false" aria-controls="finding-age">Age group</button><button type="button" aria-pressed="false" aria-controls="finding-education">Education</button><button type="button" aria-pressed="false" aria-controls="finding-seat-type">Seat type</button><button type="button" aria-pressed="false" aria-controls="finding-language">Language at home</button></div>
+    <div class="facets" role="group" aria-label="Compare voters by demographic"><button type="button" aria-pressed="true" aria-controls="finding-generation">Generation</button><button type="button" aria-pressed="false" aria-controls="finding-age">Age group</button><button type="button" aria-pressed="false" aria-controls="finding-education">Education</button><button type="button" aria-pressed="false" aria-controls="finding-seat-type">Seat type</button><button type="button" aria-pressed="false" aria-controls="finding-language">Language at home</button><button type="button" aria-pressed="false" aria-controls="finding-state-territory">State/territory</button></div>
     <div aria-live="polite"><div id="finding-generation" class="finding">
     <div class="bar-key"><span><i class="hatched"></i>Gen Z</span><span><i class="solid"></i>Boomers</span></div>
     <div class="party-plot"><div class="party-row grn" role="img" aria-label="Greens. Gen Z: 33.6%. Boomers: 4%."><span class="party-label">Greens</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:84%"></i><b>33.6%</b></span><span class="bar-line"><i class="bar solid" style="width:10%"></i><b>4.0%</b></span></span></div><div class="party-row onp" role="img" aria-label="One Nation. Gen Z: 11.2%. Boomers: 29.1%."><span class="party-label">One Nation</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:28%"></i><b>11.2%</b></span><span class="bar-line"><i class="bar solid" style="width:72.75%"></i><b>29.1%</b></span></span></div><div class="party-row lnp" role="img" aria-label="Coalition. Gen Z: 15.2%. Boomers: 31.4%."><span class="party-label">Coalition</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:38%"></i><b>15.2%</b></span><span class="bar-line"><i class="bar solid" style="width:78.5%"></i><b>31.4%</b></span></span></div><div class="party-row alp" role="img" aria-label="Labor. Gen Z: 28.8%. Boomers: 26.6%."><span class="party-label">Labor</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:72%"></i><b>28.8%</b></span><span class="bar-line"><i class="bar solid" style="width:66.5%"></i><b>26.6%</b></span></span></div></div>
@@ -467,6 +467,14 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
       <p class="takeaway-context">Compared with voters who speak only English at home, those who speak another language are</p>
       <ul><li><strong>27% more likely</strong> to back <span class="party-name alp">Labor</span></li><li><strong>37% less likely</strong> to back <span class="party-name onp">One Nation</span></li></ul>
     </div>
+  </div>
+<div id="finding-state-territory" class="finding" hidden>
+    <div class="bar-key"><span><i class="hatched"></i>ACT/NT/Tas</span><span><i class="solid"></i>Qld</span></div>
+    <div class="party-plot"><div class="party-row onp" role="img" aria-label="One Nation. ACT/NT/Tas: 18.1%. Qld: 30.2%."><span class="party-label">One Nation</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:45.25000000000001%"></i><b>18.1%</b></span><span class="bar-line"><i class="bar solid" style="width:75.5%"></i><b>30.2%</b></span></span></div><div class="party-row alp" role="img" aria-label="Labor. ACT/NT/Tas: 32.3%. Qld: 24.1%."><span class="party-label">Labor</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:80.74999999999999%"></i><b>32.3%</b></span><span class="bar-line"><i class="bar solid" style="width:60.25%"></i><b>24.1%</b></span></span></div><div class="party-row lnp" role="img" aria-label="Coalition. ACT/NT/Tas: 20.4%. Qld: 23.8%."><span class="party-label">Coalition</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:50.99999999999999%"></i><b>20.4%</b></span><span class="bar-line"><i class="bar solid" style="width:59.5%"></i><b>23.8%</b></span></span></div><div class="party-row grn" role="img" aria-label="Greens. ACT/NT/Tas: 13.5%. Qld: 12.5%."><span class="party-label">Greens</span><span class="bar-pair"><span class="bar-line"><i class="bar hatched" style="width:33.75%"></i><b>13.5%</b></span><span class="bar-line"><i class="bar solid" style="width:31.25%"></i><b>12.5%</b></span></span></div></div>
+    <div class="takeaway">
+      <p class="takeaway-context">Compared with voters in the combined ACT, NT and Tasmania group, Queenslanders are</p>
+      <ul><li><strong>67% more likely</strong> to back <span class="party-name onp">One Nation</span></li><li><strong>25% less likely</strong> to back <span class="party-name alp">Labor</span></li></ul>
+    </div>
   </div></div>
   </div>
 </section>
@@ -479,84 +487,84 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
           <i class="demo-fill" style="width:72%"></i>
           <i class="demo-interval" style="left:64.75%;width:14.5%"></i>
         </span><b>28.8%</b><span class="sr">Approximate 95% credible interval 25.9–31.7%</span>
-      </div><div class="demo-row" title="Millennials · 28.1% (95% interval 25.5–30.7%)">
+      </div><div class="demo-row" title="Millennials · 28.1% (95% interval 25.4–30.8%)">
         <span>Millennials</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:70.25%"></i>
-          <i class="demo-interval" style="left:63.75%;width:13%"></i>
-        </span><b>28.1%</b><span class="sr">Approximate 95% credible interval 25.5–30.7%</span>
-      </div><div class="demo-row" title="Gen X · 25.7% (95% interval 23.0–28.4%)">
+          <i class="demo-interval" style="left:63.5%;width:13.5%"></i>
+        </span><b>28.1%</b><span class="sr">Approximate 95% credible interval 25.4–30.8%</span>
+      </div><div class="demo-row" title="Gen X · 25.7% (95% interval 23.1–28.3%)">
         <span>Gen X</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:64.25%"></i>
-          <i class="demo-interval" style="left:57.5%;width:13.5%"></i>
-        </span><b>25.7%</b><span class="sr">Approximate 95% credible interval 23.0–28.4%</span>
-      </div><div class="demo-row" title="Boomers · 26.6% (95% interval 24.1–29.1%)">
+          <i class="demo-interval" style="left:57.75%;width:13%"></i>
+        </span><b>25.7%</b><span class="sr">Approximate 95% credible interval 23.1–28.3%</span>
+      </div><div class="demo-row" title="Boomers · 26.6% (95% interval 24.0–29.2%)">
         <span>Boomers</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:66.5%"></i>
-          <i class="demo-interval" style="left:60.25%;width:12.5%"></i>
-        </span><b>26.6%</b><span class="sr">Approximate 95% credible interval 24.1–29.1%</span>
+          <i class="demo-interval" style="left:60%;width:13%"></i>
+        </span><b>26.6%</b><span class="sr">Approximate 95% credible interval 24.0–29.2%</span>
       </div></div></section><section class="demo-party" style="--party:var(--on)">
-      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Gen Z and Millennials"><span class="sr">One Nation: Gen Z and Millennials have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="Millennials and Gen X"><span class="sr">One Nation: Millennials and Gen X have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:2" title="Millennials and Boomers"><span class="sr">One Nation: Millennials and Boomers have a credible difference.</span></i><div class="demo-row" title="Gen Z · 11.2% (95% interval 8.5–13.9%)">
+      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Gen Z and Millennials"><span class="sr">One Nation: Gen Z and Millennials have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="Millennials and Gen X"><span class="sr">One Nation: Millennials and Gen X have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:2" title="Millennials and Boomers"><span class="sr">One Nation: Millennials and Boomers have a credible difference.</span></i><div class="demo-row" title="Gen Z · 11.2% (95% interval 9.3–13.1%)">
         <span>Gen Z</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:28%"></i>
-          <i class="demo-interval" style="left:21.25%;width:13.5%"></i>
-        </span><b>11.2%</b><span class="sr">Approximate 95% credible interval 8.5–13.9%</span>
-      </div><div class="demo-row" title="Millennials · 23.2% (95% interval 22.4–24.0%)">
+          <i class="demo-interval" style="left:23.249999999999996%;width:9.5%"></i>
+        </span><b>11.2%</b><span class="sr">Approximate 95% credible interval 9.3–13.1%</span>
+      </div><div class="demo-row" title="Millennials · 23.2% (95% interval 20.6–25.8%)">
         <span>Millennials</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:58%"></i>
-          <i class="demo-interval" style="left:56%;width:4%"></i>
-        </span><b>23.2%</b><span class="sr">Approximate 95% credible interval 22.4–24.0%</span>
-      </div><div class="demo-row" title="Gen X · 29.8% (95% interval 29.8–29.8%)">
+          <i class="demo-interval" style="left:51.5%;width:13%"></i>
+        </span><b>23.2%</b><span class="sr">Approximate 95% credible interval 20.6–25.8%</span>
+      </div><div class="demo-row" title="Gen X · 29.8% (95% interval 27.1–32.5%)">
         <span>Gen X</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:74.5%"></i>
-          <i class="demo-interval" style="left:74.5%;width:0%"></i>
-        </span><b>29.8%</b><span class="sr">Approximate 95% credible interval 29.8–29.8%</span>
-      </div><div class="demo-row" title="Boomers · 29.1% (95% interval 29.1–29.1%)">
+          <i class="demo-interval" style="left:67.75%;width:13.5%"></i>
+        </span><b>29.8%</b><span class="sr">Approximate 95% credible interval 27.1–32.5%</span>
+      </div><div class="demo-row" title="Boomers · 29.1% (95% interval 26.5–31.7%)">
         <span>Boomers</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:72.75%"></i>
-          <i class="demo-interval" style="left:72.75%;width:0%"></i>
-        </span><b>29.1%</b><span class="sr">Approximate 95% credible interval 29.1–29.1%</span>
+          <i class="demo-interval" style="left:66.25%;width:13%"></i>
+        </span><b>29.1%</b><span class="sr">Approximate 95% credible interval 26.5–31.7%</span>
       </div></div></section><section class="demo-party" style="--party:var(--lnp)">
-      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Gen Z and Millennials"><span class="sr">Coalition: Gen Z and Millennials have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="Millennials and Gen X"><span class="sr">Coalition: Millennials and Gen X have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Gen X and Boomers"><span class="sr">Coalition: Gen X and Boomers have a credible difference.</span></i><div class="demo-row" title="Gen Z · 15.2% (95% interval 15.2–15.2%)">
+      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Gen Z and Millennials"><span class="sr">Coalition: Gen Z and Millennials have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="Millennials and Gen X"><span class="sr">Coalition: Millennials and Gen X have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Gen X and Boomers"><span class="sr">Coalition: Gen X and Boomers have a credible difference.</span></i><div class="demo-row" title="Gen Z · 15.2% (95% interval 13.0–17.4%)">
         <span>Gen Z</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:38%"></i>
-          <i class="demo-interval" style="left:38%;width:0%"></i>
-        </span><b>15.2%</b><span class="sr">Approximate 95% credible interval 15.2–15.2%</span>
-      </div><div class="demo-row" title="Millennials · 20.8% (95% interval 20.8–20.8%)">
+          <i class="demo-interval" style="left:32.5%;width:11.000000000000002%"></i>
+        </span><b>15.2%</b><span class="sr">Approximate 95% credible interval 13.0–17.4%</span>
+      </div><div class="demo-row" title="Millennials · 20.8% (95% interval 18.3–23.3%)">
         <span>Millennials</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:52%"></i>
-          <i class="demo-interval" style="left:52%;width:0%"></i>
-        </span><b>20.8%</b><span class="sr">Approximate 95% credible interval 20.8–20.8%</span>
-      </div><div class="demo-row" title="Gen X · 25.3% (95% interval 25.3–25.3%)">
+          <i class="demo-interval" style="left:45.75%;width:12.5%"></i>
+        </span><b>20.8%</b><span class="sr">Approximate 95% credible interval 18.3–23.3%</span>
+      </div><div class="demo-row" title="Gen X · 25.3% (95% interval 22.6–28.0%)">
         <span>Gen X</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:63.25%"></i>
-          <i class="demo-interval" style="left:63.25%;width:0%"></i>
-        </span><b>25.3%</b><span class="sr">Approximate 95% credible interval 25.3–25.3%</span>
-      </div><div class="demo-row" title="Boomers · 31.4% (95% interval 31.4–31.4%)">
+          <i class="demo-interval" style="left:56.5%;width:13.5%"></i>
+        </span><b>25.3%</b><span class="sr">Approximate 95% credible interval 22.6–28.0%</span>
+      </div><div class="demo-row" title="Boomers · 31.4% (95% interval 28.3–34.5%)">
         <span>Boomers</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:78.5%"></i>
-          <i class="demo-interval" style="left:78.5%;width:0%"></i>
-        </span><b>31.4%</b><span class="sr">Approximate 95% credible interval 31.4–31.4%</span>
+          <i class="demo-interval" style="left:70.74999999999999%;width:15.5%"></i>
+        </span><b>31.4%</b><span class="sr">Approximate 95% credible interval 28.3–34.5%</span>
       </div></div></section><section class="demo-party" style="--party:var(--grn)">
-      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Gen Z and Millennials"><span class="sr">Greens: Gen Z and Millennials have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="Millennials and Gen X"><span class="sr">Greens: Millennials and Gen X have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Gen X and Boomers"><span class="sr">Greens: Gen X and Boomers have a credible difference.</span></i><div class="demo-row" title="Gen Z · 33.6% (95% interval 33.6–33.6%)">
+      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Gen Z and Millennials"><span class="sr">Greens: Gen Z and Millennials have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="Millennials and Gen X"><span class="sr">Greens: Millennials and Gen X have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Gen X and Boomers"><span class="sr">Greens: Gen X and Boomers have a credible difference.</span></i><div class="demo-row" title="Gen Z · 33.6% (95% interval 30.9–36.3%)">
         <span>Gen Z</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:84%"></i>
-          <i class="demo-interval" style="left:84%;width:0%"></i>
-        </span><b>33.6%</b><span class="sr">Approximate 95% credible interval 33.6–33.6%</span>
-      </div><div class="demo-row" title="Millennials · 17% (95% interval 17.0–17.0%)">
+          <i class="demo-interval" style="left:77.25%;width:13.5%"></i>
+        </span><b>33.6%</b><span class="sr">Approximate 95% credible interval 30.9–36.3%</span>
+      </div><div class="demo-row" title="Millennials · 17% (95% interval 14.9–19.1%)">
         <span>Millennials</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:42.5%"></i>
-          <i class="demo-interval" style="left:42.5%;width:0%"></i>
-        </span><b>17.0%</b><span class="sr">Approximate 95% credible interval 17.0–17.0%</span>
-      </div><div class="demo-row" title="Gen X · 8.6% (95% interval 8.6–8.6%)">
+          <i class="demo-interval" style="left:37.25%;width:10.5%"></i>
+        </span><b>17.0%</b><span class="sr">Approximate 95% credible interval 14.9–19.1%</span>
+      </div><div class="demo-row" title="Gen X · 8.6% (95% interval 7.3–9.9%)">
         <span>Gen X</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:21.5%"></i>
-          <i class="demo-interval" style="left:21.5%;width:0%"></i>
-        </span><b>8.6%</b><span class="sr">Approximate 95% credible interval 8.6–8.6%</span>
-      </div><div class="demo-row" title="Boomers · 4% (95% interval 4.0–4.0%)">
+          <i class="demo-interval" style="left:18.25%;width:6.5%"></i>
+        </span><b>8.6%</b><span class="sr">Approximate 95% credible interval 7.3–9.9%</span>
+      </div><div class="demo-row" title="Boomers · 4% (95% interval 3.2–4.8%)">
         <span>Boomers</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:10%"></i>
-          <i class="demo-interval" style="left:10%;width:0%"></i>
-        </span><b>4.0%</b><span class="sr">Approximate 95% credible interval 4.0–4.0%</span>
+          <i class="demo-interval" style="left:8%;width:4%"></i>
+        </span><b>4.0%</b><span class="sr">Approximate 95% credible interval 3.2–4.8%</span>
       </div></div></section></div>
     <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Brackets connect selected groups whose 95% interval for the difference excludes zero.</p>
     <p class="src">AusPol Tracker estimates from YouGov and RedBridge/Accent, 24 November 2026.</p>
@@ -573,64 +581,64 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
           <i class="demo-fill" style="width:73.75%"></i>
           <i class="demo-interval" style="left:67.75%;width:12%"></i>
         </span><b>29.5%</b><span class="sr">Approximate 95% credible interval 27.1–31.9%</span>
-      </div><div class="demo-row" title="35–54 · 27.6% (95% interval 25.6–29.6%)">
+      </div><div class="demo-row" title="35–54 · 27.6% (95% interval 25.4–29.8%)">
         <span>35–54</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:69%"></i>
-          <i class="demo-interval" style="left:64%;width:10%"></i>
-        </span><b>27.6%</b><span class="sr">Approximate 95% credible interval 25.6–29.6%</span>
+          <i class="demo-interval" style="left:63.5%;width:11.000000000000002%"></i>
+        </span><b>27.6%</b><span class="sr">Approximate 95% credible interval 25.4–29.8%</span>
       </div><div class="demo-row" title="55+ · 24.5% (95% interval 22.5–26.5%)">
         <span>55+</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:61.25%"></i>
           <i class="demo-interval" style="left:56.25%;width:10%"></i>
         </span><b>24.5%</b><span class="sr">Approximate 95% credible interval 22.5–26.5%</span>
       </div></div></section><section class="demo-party" style="--party:var(--on)">
-      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="18–34 and 35–54"><span class="sr">One Nation: 18–34 and 35–54 have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="35–54 and 55+"><span class="sr">One Nation: 35–54 and 55+ have a credible difference.</span></i><div class="demo-row" title="18–34 · 15.7% (95% interval 13.6–17.8%)">
+      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="18–34 and 35–54"><span class="sr">One Nation: 18–34 and 35–54 have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="35–54 and 55+"><span class="sr">One Nation: 35–54 and 55+ have a credible difference.</span></i><div class="demo-row" title="18–34 · 15.7% (95% interval 13.7–17.7%)">
         <span>18–34</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:39.25%"></i>
-          <i class="demo-interval" style="left:34%;width:10.5%"></i>
-        </span><b>15.7%</b><span class="sr">Approximate 95% credible interval 13.6–17.8%</span>
-      </div><div class="demo-row" title="35–54 · 25.7% (95% interval 25.7–25.7%)">
+          <i class="demo-interval" style="left:34.25%;width:10%"></i>
+        </span><b>15.7%</b><span class="sr">Approximate 95% credible interval 13.7–17.7%</span>
+      </div><div class="demo-row" title="35–54 · 25.7% (95% interval 23.3–28.1%)">
         <span>35–54</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:64.25%"></i>
-          <i class="demo-interval" style="left:64.25%;width:0%"></i>
-        </span><b>25.7%</b><span class="sr">Approximate 95% credible interval 25.7–25.7%</span>
-      </div><div class="demo-row" title="55+ · 30% (95% interval 30.0–30.0%)">
+          <i class="demo-interval" style="left:58.25%;width:12%"></i>
+        </span><b>25.7%</b><span class="sr">Approximate 95% credible interval 23.3–28.1%</span>
+      </div><div class="demo-row" title="55+ · 30% (95% interval 27.6–32.4%)">
         <span>55+</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:75%"></i>
-          <i class="demo-interval" style="left:75%;width:0%"></i>
-        </span><b>30.0%</b><span class="sr">Approximate 95% credible interval 30.0–30.0%</span>
+          <i class="demo-interval" style="left:69%;width:12%"></i>
+        </span><b>30.0%</b><span class="sr">Approximate 95% credible interval 27.6–32.4%</span>
       </div></div></section><section class="demo-party" style="--party:var(--lnp)">
-      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="18–34 and 35–54"><span class="sr">Coalition: 18–34 and 35–54 have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="35–54 and 55+"><span class="sr">Coalition: 35–54 and 55+ have a credible difference.</span></i><div class="demo-row" title="18–34 · 18.2% (95% interval 18.2–18.2%)">
+      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="18–34 and 35–54"><span class="sr">Coalition: 18–34 and 35–54 have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="35–54 and 55+"><span class="sr">Coalition: 35–54 and 55+ have a credible difference.</span></i><div class="demo-row" title="18–34 · 18.2% (95% interval 16.2–20.2%)">
         <span>18–34</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:45.5%"></i>
-          <i class="demo-interval" style="left:45.5%;width:0%"></i>
-        </span><b>18.2%</b><span class="sr">Approximate 95% credible interval 18.2–18.2%</span>
-      </div><div class="demo-row" title="35–54 · 22.8% (95% interval 22.8–22.8%)">
+          <i class="demo-interval" style="left:40.5%;width:10%"></i>
+        </span><b>18.2%</b><span class="sr">Approximate 95% credible interval 16.2–20.2%</span>
+      </div><div class="demo-row" title="35–54 · 22.8% (95% interval 20.5–25.1%)">
         <span>35–54</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:57%"></i>
-          <i class="demo-interval" style="left:57%;width:0%"></i>
-        </span><b>22.8%</b><span class="sr">Approximate 95% credible interval 22.8–22.8%</span>
-      </div><div class="demo-row" title="55+ · 30.5% (95% interval 30.5–30.5%)">
+          <i class="demo-interval" style="left:51.25%;width:11.499999999999998%"></i>
+        </span><b>22.8%</b><span class="sr">Approximate 95% credible interval 20.5–25.1%</span>
+      </div><div class="demo-row" title="55+ · 30.5% (95% interval 27.9–33.1%)">
         <span>55+</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:76.25%"></i>
-          <i class="demo-interval" style="left:76.25%;width:0%"></i>
-        </span><b>30.5%</b><span class="sr">Approximate 95% credible interval 30.5–30.5%</span>
+          <i class="demo-interval" style="left:69.75%;width:13%"></i>
+        </span><b>30.5%</b><span class="sr">Approximate 95% credible interval 27.9–33.1%</span>
       </div></div></section><section class="demo-party" style="--party:var(--grn)">
-      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="18–34 and 35–54"><span class="sr">Greens: 18–34 and 35–54 have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="35–54 and 55+"><span class="sr">Greens: 35–54 and 55+ have a credible difference.</span></i><div class="demo-row" title="18–34 · 26.8% (95% interval 26.8–26.8%)">
+      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="18–34 and 35–54"><span class="sr">Greens: 18–34 and 35–54 have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="35–54 and 55+"><span class="sr">Greens: 35–54 and 55+ have a credible difference.</span></i><div class="demo-row" title="18–34 · 26.8% (95% interval 24.7–28.9%)">
         <span>18–34</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:67%"></i>
-          <i class="demo-interval" style="left:67%;width:0%"></i>
-        </span><b>26.8%</b><span class="sr">Approximate 95% credible interval 26.8–26.8%</span>
-      </div><div class="demo-row" title="35–54 · 12.8% (95% interval 12.8–12.8%)">
+          <i class="demo-interval" style="left:61.75%;width:10.5%"></i>
+        </span><b>26.8%</b><span class="sr">Approximate 95% credible interval 24.7–28.9%</span>
+      </div><div class="demo-row" title="35–54 · 12.8% (95% interval 11.4–14.2%)">
         <span>35–54</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:32%"></i>
-          <i class="demo-interval" style="left:32%;width:0%"></i>
-        </span><b>12.8%</b><span class="sr">Approximate 95% credible interval 12.8–12.8%</span>
-      </div><div class="demo-row" title="55+ · 5% (95% interval 5.0–5.0%)">
+          <i class="demo-interval" style="left:28.5%;width:7%"></i>
+        </span><b>12.8%</b><span class="sr">Approximate 95% credible interval 11.4–14.2%</span>
+      </div><div class="demo-row" title="55+ · 5% (95% interval 4.3–5.7%)">
         <span>55+</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:12.5%"></i>
-          <i class="demo-interval" style="left:12.5%;width:0%"></i>
-        </span><b>5.0%</b><span class="sr">Approximate 95% credible interval 5.0–5.0%</span>
+          <i class="demo-interval" style="left:10.75%;width:3.5%"></i>
+        </span><b>5.0%</b><span class="sr">Approximate 95% credible interval 4.3–5.7%</span>
       </div></div></section></div>
     <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Brackets connect selected groups whose 95% interval for the difference excludes zero.</p>
     <p class="src">AusPol Tracker estimates from YouGov, Essential, DemosAU and Resolve, 24 November 2026.</p>
@@ -652,59 +660,59 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
           <i class="demo-fill" style="width:63.5%"></i>
           <i class="demo-interval" style="left:57.25%;width:12.5%"></i>
         </span><b>25.4%</b><span class="sr">Approximate 95% credible interval 22.9–27.9%</span>
-      </div><div class="demo-row" title="University · 31% (95% interval 28.4–33.6%)">
+      </div><div class="demo-row" title="University · 31% (95% interval 28.2–33.8%)">
         <span>University</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:77.5%"></i>
-          <i class="demo-interval" style="left:71%;width:13%"></i>
-        </span><b>31.0%</b><span class="sr">Approximate 95% credible interval 28.4–33.6%</span>
+          <i class="demo-interval" style="left:70.5%;width:14%"></i>
+        </span><b>31.0%</b><span class="sr">Approximate 95% credible interval 28.2–33.8%</span>
       </div></div></section><section class="demo-party" style="--party:var(--on)">
-      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:1;--span:1" title="TAFE or trade and University"><span class="sr">One Nation: TAFE or trade and University have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="Year 12 or less and University"><span class="sr">One Nation: Year 12 or less and University have a credible difference.</span></i><div class="demo-row" title="Year 12 or less · 28.2% (95% interval 26.5–29.9%)">
+      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:1;--span:1" title="TAFE or trade and University"><span class="sr">One Nation: TAFE or trade and University have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="Year 12 or less and University"><span class="sr">One Nation: Year 12 or less and University have a credible difference.</span></i><div class="demo-row" title="Year 12 or less · 28.2% (95% interval 25.7–30.7%)">
         <span>Year 12 or less</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:70.5%"></i>
-          <i class="demo-interval" style="left:66.25%;width:8.5%"></i>
-        </span><b>28.2%</b><span class="sr">Approximate 95% credible interval 26.5–29.9%</span>
-      </div><div class="demo-row" title="TAFE or trade · 28.8% (95% interval 28.8–28.8%)">
+          <i class="demo-interval" style="left:64.25%;width:12.5%"></i>
+        </span><b>28.2%</b><span class="sr">Approximate 95% credible interval 25.7–30.7%</span>
+      </div><div class="demo-row" title="TAFE or trade · 28.8% (95% interval 26.1–31.5%)">
         <span>TAFE or trade</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:72%"></i>
-          <i class="demo-interval" style="left:72%;width:0%"></i>
-        </span><b>28.8%</b><span class="sr">Approximate 95% credible interval 28.8–28.8%</span>
-      </div><div class="demo-row" title="University · 15.7% (95% interval 15.7–15.7%)">
+          <i class="demo-interval" style="left:65.25%;width:13.5%"></i>
+        </span><b>28.8%</b><span class="sr">Approximate 95% credible interval 26.1–31.5%</span>
+      </div><div class="demo-row" title="University · 15.7% (95% interval 13.7–17.7%)">
         <span>University</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:39.25%"></i>
-          <i class="demo-interval" style="left:39.25%;width:0%"></i>
-        </span><b>15.7%</b><span class="sr">Approximate 95% credible interval 15.7–15.7%</span>
+          <i class="demo-interval" style="left:34.25%;width:10%"></i>
+        </span><b>15.7%</b><span class="sr">Approximate 95% credible interval 13.7–17.7%</span>
       </div></div></section><section class="demo-party" style="--party:var(--lnp)">
-      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:1;--span:1" title="TAFE or trade and University"><span class="sr">Coalition: TAFE or trade and University have a credible difference.</span></i><div class="demo-row" title="Year 12 or less · 24.5% (95% interval 24.5–24.5%)">
+      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:1;--span:1" title="TAFE or trade and University"><span class="sr">Coalition: TAFE or trade and University have a credible difference.</span></i><div class="demo-row" title="Year 12 or less · 24.5% (95% interval 21.9–27.1%)">
         <span>Year 12 or less</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:61.25%"></i>
-          <i class="demo-interval" style="left:61.25%;width:0%"></i>
-        </span><b>24.5%</b><span class="sr">Approximate 95% credible interval 24.5–24.5%</span>
-      </div><div class="demo-row" title="TAFE or trade · 23% (95% interval 23.0–23.0%)">
+          <i class="demo-interval" style="left:54.75%;width:13%"></i>
+        </span><b>24.5%</b><span class="sr">Approximate 95% credible interval 21.9–27.1%</span>
+      </div><div class="demo-row" title="TAFE or trade · 23% (95% interval 20.5–25.5%)">
         <span>TAFE or trade</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:57.5%"></i>
-          <i class="demo-interval" style="left:57.5%;width:0%"></i>
-        </span><b>23.0%</b><span class="sr">Approximate 95% credible interval 23.0–23.0%</span>
-      </div><div class="demo-row" title="University · 26.9% (95% interval 26.9–26.9%)">
+          <i class="demo-interval" style="left:51.25%;width:12.5%"></i>
+        </span><b>23.0%</b><span class="sr">Approximate 95% credible interval 20.5–25.5%</span>
+      </div><div class="demo-row" title="University · 26.9% (95% interval 24.2–29.6%)">
         <span>University</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:67.25%"></i>
-          <i class="demo-interval" style="left:67.25%;width:0%"></i>
-        </span><b>26.9%</b><span class="sr">Approximate 95% credible interval 26.9–26.9%</span>
+          <i class="demo-interval" style="left:60.5%;width:13.5%"></i>
+        </span><b>26.9%</b><span class="sr">Approximate 95% credible interval 24.2–29.6%</span>
       </div></div></section><section class="demo-party" style="--party:var(--grn)">
-      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Year 12 or less and TAFE or trade"><span class="sr">Greens: Year 12 or less and TAFE or trade have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="TAFE or trade and University"><span class="sr">Greens: TAFE or trade and University have a credible difference.</span></i><div class="demo-row" title="Year 12 or less · 13.6% (95% interval 13.6–13.6%)">
+      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Year 12 or less and TAFE or trade"><span class="sr">Greens: Year 12 or less and TAFE or trade have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="TAFE or trade and University"><span class="sr">Greens: TAFE or trade and University have a credible difference.</span></i><div class="demo-row" title="Year 12 or less · 13.6% (95% interval 11.9–15.3%)">
         <span>Year 12 or less</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:34%"></i>
-          <i class="demo-interval" style="left:34%;width:0%"></i>
-        </span><b>13.6%</b><span class="sr">Approximate 95% credible interval 13.6–13.6%</span>
-      </div><div class="demo-row" title="TAFE or trade · 11.4% (95% interval 11.4–11.4%)">
+          <i class="demo-interval" style="left:29.75%;width:8.5%"></i>
+        </span><b>13.6%</b><span class="sr">Approximate 95% credible interval 11.9–15.3%</span>
+      </div><div class="demo-row" title="TAFE or trade · 11.4% (95% interval 9.9–12.9%)">
         <span>TAFE or trade</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:28.5%"></i>
-          <i class="demo-interval" style="left:28.5%;width:0%"></i>
-        </span><b>11.4%</b><span class="sr">Approximate 95% credible interval 11.4–11.4%</span>
-      </div><div class="demo-row" title="University · 15.7% (95% interval 15.7–15.7%)">
+          <i class="demo-interval" style="left:24.75%;width:7.5%"></i>
+        </span><b>11.4%</b><span class="sr">Approximate 95% credible interval 9.9–12.9%</span>
+      </div><div class="demo-row" title="University · 15.7% (95% interval 13.9–17.5%)">
         <span>University</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:39.25%"></i>
-          <i class="demo-interval" style="left:39.25%;width:0%"></i>
-        </span><b>15.7%</b><span class="sr">Approximate 95% credible interval 15.7–15.7%</span>
+          <i class="demo-interval" style="left:34.74999999999999%;width:9%"></i>
+        </span><b>15.7%</b><span class="sr">Approximate 95% credible interval 13.9–17.5%</span>
       </div></div></section></div>
     <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Brackets connect selected groups whose 95% interval for the difference excludes zero.</p>
     <p class="src">AusPol Tracker estimates from YouGov, DemosAU and RedBridge/Accent, 24 November 2026.</p>
@@ -721,84 +729,84 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
           <i class="demo-fill" style="width:72.5%"></i>
           <i class="demo-interval" style="left:64.75%;width:15.5%"></i>
         </span><b>29.0%</b><span class="sr">Approximate 95% credible interval 25.9–32.1%</span>
-      </div><div class="demo-row" title="Outer metro · 31.2% (95% interval 28.4–34.0%)">
+      </div><div class="demo-row" title="Outer metro · 31.2% (95% interval 28.0–34.4%)">
         <span>Outer metro</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:78%"></i>
-          <i class="demo-interval" style="left:71%;width:14%"></i>
-        </span><b>31.2%</b><span class="sr">Approximate 95% credible interval 28.4–34.0%</span>
-      </div><div class="demo-row" title="Provincial · 29.5% (95% interval 26.0–33.0%)">
+          <i class="demo-interval" style="left:70%;width:16%"></i>
+        </span><b>31.2%</b><span class="sr">Approximate 95% credible interval 28.0–34.4%</span>
+      </div><div class="demo-row" title="Provincial · 29.5% (95% interval 25.7–33.3%)">
         <span>Provincial</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:73.75%"></i>
-          <i class="demo-interval" style="left:65%;width:17.5%"></i>
-        </span><b>29.5%</b><span class="sr">Approximate 95% credible interval 26.0–33.0%</span>
-      </div><div class="demo-row" title="Rural · 18.3% (95% interval 15.4–21.2%)">
+          <i class="demo-interval" style="left:64.25%;width:19%"></i>
+        </span><b>29.5%</b><span class="sr">Approximate 95% credible interval 25.7–33.3%</span>
+      </div><div class="demo-row" title="Rural · 18.3% (95% interval 15.5–21.1%)">
         <span>Rural</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:45.75%"></i>
-          <i class="demo-interval" style="left:38.5%;width:14.5%"></i>
-        </span><b>18.3%</b><span class="sr">Approximate 95% credible interval 15.4–21.2%</span>
+          <i class="demo-interval" style="left:38.75%;width:14%"></i>
+        </span><b>18.3%</b><span class="sr">Approximate 95% credible interval 15.5–21.1%</span>
       </div></div></section><section class="demo-party" style="--party:var(--on)">
-      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Inner metro and Outer metro"><span class="sr">One Nation: Inner metro and Outer metro have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Provincial and Rural"><span class="sr">One Nation: Provincial and Rural have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="Inner metro and Provincial"><span class="sr">One Nation: Inner metro and Provincial have a credible difference.</span></i><div class="demo-row" title="Inner metro · 17.1% (95% interval 14.6–19.6%)">
+      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Inner metro and Outer metro"><span class="sr">One Nation: Inner metro and Outer metro have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Provincial and Rural"><span class="sr">One Nation: Provincial and Rural have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="Inner metro and Provincial"><span class="sr">One Nation: Inner metro and Provincial have a credible difference.</span></i><div class="demo-row" title="Inner metro · 17.1% (95% interval 14.3–19.9%)">
         <span>Inner metro</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:42.75000000000001%"></i>
-          <i class="demo-interval" style="left:36.50000000000001%;width:12.5%"></i>
-        </span><b>17.1%</b><span class="sr">Approximate 95% credible interval 14.6–19.6%</span>
-      </div><div class="demo-row" title="Outer metro · 24.6% (95% interval 22.7–26.5%)">
+          <i class="demo-interval" style="left:35.75%;width:14%"></i>
+        </span><b>17.1%</b><span class="sr">Approximate 95% credible interval 14.3–19.9%</span>
+      </div><div class="demo-row" title="Outer metro · 24.6% (95% interval 21.5–27.7%)">
         <span>Outer metro</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:61.5%"></i>
-          <i class="demo-interval" style="left:56.750000000000014%;width:9.5%"></i>
-        </span><b>24.6%</b><span class="sr">Approximate 95% credible interval 22.7–26.5%</span>
-      </div><div class="demo-row" title="Provincial · 26.5% (95% interval 26.5–26.5%)">
+          <i class="demo-interval" style="left:53.75%;width:15.5%"></i>
+        </span><b>24.6%</b><span class="sr">Approximate 95% credible interval 21.5–27.7%</span>
+      </div><div class="demo-row" title="Provincial · 26.5% (95% interval 23.0–30.0%)">
         <span>Provincial</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:66.25%"></i>
-          <i class="demo-interval" style="left:66.25%;width:0%"></i>
-        </span><b>26.5%</b><span class="sr">Approximate 95% credible interval 26.5–26.5%</span>
-      </div><div class="demo-row" title="Rural · 31.4% (95% interval 31.4–31.4%)">
+          <i class="demo-interval" style="left:57.5%;width:17.5%"></i>
+        </span><b>26.5%</b><span class="sr">Approximate 95% credible interval 23.0–30.0%</span>
+      </div><div class="demo-row" title="Rural · 31.4% (95% interval 27.4–35.4%)">
         <span>Rural</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:78.5%"></i>
-          <i class="demo-interval" style="left:78.5%;width:0%"></i>
-        </span><b>31.4%</b><span class="sr">Approximate 95% credible interval 31.4–31.4%</span>
+          <i class="demo-interval" style="left:68.5%;width:20%"></i>
+        </span><b>31.4%</b><span class="sr">Approximate 95% credible interval 27.4–35.4%</span>
       </div></div></section><section class="demo-party" style="--party:var(--lnp)">
-      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:1;--span:2" title="Outer metro and Rural"><span class="sr">Coalition: Outer metro and Rural have a credible difference.</span></i><div class="demo-row" title="Inner metro · 25.1% (95% interval 25.1–25.1%)">
+      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:1;--span:2" title="Outer metro and Rural"><span class="sr">Coalition: Outer metro and Rural have a credible difference.</span></i><div class="demo-row" title="Inner metro · 25.1% (95% interval 22.0–28.2%)">
         <span>Inner metro</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:62.75%"></i>
-          <i class="demo-interval" style="left:62.75%;width:0%"></i>
-        </span><b>25.1%</b><span class="sr">Approximate 95% credible interval 25.1–25.1%</span>
-      </div><div class="demo-row" title="Outer metro · 22.8% (95% interval 22.8–22.8%)">
+          <i class="demo-interval" style="left:55%;width:15.5%"></i>
+        </span><b>25.1%</b><span class="sr">Approximate 95% credible interval 22.0–28.2%</span>
+      </div><div class="demo-row" title="Outer metro · 22.8% (95% interval 19.9–25.7%)">
         <span>Outer metro</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:57%"></i>
-          <i class="demo-interval" style="left:57%;width:0%"></i>
-        </span><b>22.8%</b><span class="sr">Approximate 95% credible interval 22.8–22.8%</span>
-      </div><div class="demo-row" title="Provincial · 23.6% (95% interval 23.6–23.6%)">
+          <i class="demo-interval" style="left:49.75000000000001%;width:14.5%"></i>
+        </span><b>22.8%</b><span class="sr">Approximate 95% credible interval 19.9–25.7%</span>
+      </div><div class="demo-row" title="Provincial · 23.6% (95% interval 20.2–27.0%)">
         <span>Provincial</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:59%"></i>
-          <i class="demo-interval" style="left:59%;width:0%"></i>
-        </span><b>23.6%</b><span class="sr">Approximate 95% credible interval 23.6–23.6%</span>
-      </div><div class="demo-row" title="Rural · 27.7% (95% interval 27.7–27.7%)">
+          <i class="demo-interval" style="left:50.50000000000001%;width:17%"></i>
+        </span><b>23.6%</b><span class="sr">Approximate 95% credible interval 20.2–27.0%</span>
+      </div><div class="demo-row" title="Rural · 27.7% (95% interval 24.0–31.4%)">
         <span>Rural</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:69.25%"></i>
-          <i class="demo-interval" style="left:69.25%;width:0%"></i>
-        </span><b>27.7%</b><span class="sr">Approximate 95% credible interval 27.7–27.7%</span>
+          <i class="demo-interval" style="left:60%;width:18.5%"></i>
+        </span><b>27.7%</b><span class="sr">Approximate 95% credible interval 24.0–31.4%</span>
       </div></div></section><section class="demo-party" style="--party:var(--grn)">
-      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Inner metro and Outer metro"><span class="sr">Greens: Inner metro and Outer metro have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Provincial and Rural"><span class="sr">Greens: Provincial and Rural have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="Inner metro and Provincial"><span class="sr">Greens: Inner metro and Provincial have a credible difference.</span></i><div class="demo-row" title="Inner metro · 18.3% (95% interval 18.3–18.3%)">
+      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="Inner metro and Outer metro"><span class="sr">Greens: Inner metro and Outer metro have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Provincial and Rural"><span class="sr">Greens: Provincial and Rural have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="Inner metro and Provincial"><span class="sr">Greens: Inner metro and Provincial have a credible difference.</span></i><div class="demo-row" title="Inner metro · 18.3% (95% interval 15.8–20.8%)">
         <span>Inner metro</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:45.75%"></i>
-          <i class="demo-interval" style="left:45.75%;width:0%"></i>
-        </span><b>18.3%</b><span class="sr">Approximate 95% credible interval 18.3–18.3%</span>
-      </div><div class="demo-row" title="Outer metro · 12.4% (95% interval 12.4–12.4%)">
+          <i class="demo-interval" style="left:39.5%;width:12.5%"></i>
+        </span><b>18.3%</b><span class="sr">Approximate 95% credible interval 15.8–20.8%</span>
+      </div><div class="demo-row" title="Outer metro · 12.4% (95% interval 10.4–14.4%)">
         <span>Outer metro</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:31%"></i>
-          <i class="demo-interval" style="left:31%;width:0%"></i>
-        </span><b>12.4%</b><span class="sr">Approximate 95% credible interval 12.4–12.4%</span>
-      </div><div class="demo-row" title="Provincial · 13% (95% interval 13.0–13.0%)">
+          <i class="demo-interval" style="left:26%;width:10%"></i>
+        </span><b>12.4%</b><span class="sr">Approximate 95% credible interval 10.4–14.4%</span>
+      </div><div class="demo-row" title="Provincial · 13% (95% interval 10.5–15.5%)">
         <span>Provincial</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:32.5%"></i>
-          <i class="demo-interval" style="left:32.5%;width:0%"></i>
-        </span><b>13.0%</b><span class="sr">Approximate 95% credible interval 13.0–13.0%</span>
-      </div><div class="demo-row" title="Rural · 9.2% (95% interval 9.2–9.2%)">
+          <i class="demo-interval" style="left:26.25%;width:12.5%"></i>
+        </span><b>13.0%</b><span class="sr">Approximate 95% credible interval 10.5–15.5%</span>
+      </div><div class="demo-row" title="Rural · 9.2% (95% interval 7.3–11.1%)">
         <span>Rural</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:22.999999999999996%"></i>
-          <i class="demo-interval" style="left:22.999999999999996%;width:0%"></i>
-        </span><b>9.2%</b><span class="sr">Approximate 95% credible interval 9.2–9.2%</span>
+          <i class="demo-interval" style="left:18.249999999999996%;width:9.5%"></i>
+        </span><b>9.2%</b><span class="sr">Approximate 95% credible interval 7.3–11.1%</span>
       </div></div></section></div>
     <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Brackets connect selected groups whose 95% interval for the difference excludes zero.</p>
     <p class="src">AusPol Tracker estimates from YouGov, DemosAU and RedBridge/Accent, 24 November 2026.</p>
@@ -815,50 +823,184 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
           <i class="demo-fill" style="width:64.25%"></i>
           <i class="demo-interval" style="left:58.25%;width:12%"></i>
         </span><b>25.7%</b><span class="sr">Approximate 95% credible interval 23.3–28.1%</span>
-      </div><div class="demo-row" title="Other language · 32.6% (95% interval 29.9–35.3%)">
+      </div><div class="demo-row" title="Other language · 32.6% (95% interval 29.1–36.1%)">
         <span>Other language</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:81.5%"></i>
-          <i class="demo-interval" style="left:74.75%;width:13.5%"></i>
-        </span><b>32.6%</b><span class="sr">Approximate 95% credible interval 29.9–35.3%</span>
+          <i class="demo-interval" style="left:72.75%;width:17.5%"></i>
+        </span><b>32.6%</b><span class="sr">Approximate 95% credible interval 29.1–36.1%</span>
       </div></div></section><section class="demo-party" style="--party:var(--on)">
-      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="English only and Other language"><span class="sr">One Nation: English only and Other language have a credible difference.</span></i><div class="demo-row" title="English only · 26.2% (95% interval 24.6–27.8%)">
+      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="English only and Other language"><span class="sr">One Nation: English only and Other language have a credible difference.</span></i><div class="demo-row" title="English only · 26.2% (95% interval 23.7–28.7%)">
         <span>English only</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:65.5%"></i>
-          <i class="demo-interval" style="left:61.5%;width:8%"></i>
-        </span><b>26.2%</b><span class="sr">Approximate 95% credible interval 24.6–27.8%</span>
-      </div><div class="demo-row" title="Other language · 16.5% (95% interval 16.5–16.5%)">
+          <i class="demo-interval" style="left:59.25%;width:12.5%"></i>
+        </span><b>26.2%</b><span class="sr">Approximate 95% credible interval 23.7–28.7%</span>
+      </div><div class="demo-row" title="Other language · 16.5% (95% interval 13.8–19.2%)">
         <span>Other language</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:41.25%"></i>
-          <i class="demo-interval" style="left:41.25%;width:0%"></i>
-        </span><b>16.5%</b><span class="sr">Approximate 95% credible interval 16.5–16.5%</span>
+          <i class="demo-interval" style="left:34.5%;width:13.5%"></i>
+        </span><b>16.5%</b><span class="sr">Approximate 95% credible interval 13.8–19.2%</span>
       </div></div></section><section class="demo-party" style="--party:var(--lnp)">
-      <h3>Coalition</h3><div class="demo-series"><div class="demo-row" title="English only · 24.8% (95% interval 24.8–24.8%)">
+      <h3>Coalition</h3><div class="demo-series"><div class="demo-row" title="English only · 24.8% (95% interval 22.3–27.3%)">
         <span>English only</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:62%"></i>
-          <i class="demo-interval" style="left:62%;width:0%"></i>
-        </span><b>24.8%</b><span class="sr">Approximate 95% credible interval 24.8–24.8%</span>
-      </div><div class="demo-row" title="Other language · 24.7% (95% interval 24.7–24.7%)">
+          <i class="demo-interval" style="left:55.75%;width:12.5%"></i>
+        </span><b>24.8%</b><span class="sr">Approximate 95% credible interval 22.3–27.3%</span>
+      </div><div class="demo-row" title="Other language · 24.7% (95% interval 21.3–28.1%)">
         <span>Other language</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:61.75%"></i>
-          <i class="demo-interval" style="left:61.75%;width:0%"></i>
-        </span><b>24.7%</b><span class="sr">Approximate 95% credible interval 24.7–24.7%</span>
+          <i class="demo-interval" style="left:53.25%;width:17%"></i>
+        </span><b>24.7%</b><span class="sr">Approximate 95% credible interval 21.3–28.1%</span>
       </div></div></section><section class="demo-party" style="--party:var(--grn)">
-      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="English only and Other language"><span class="sr">Greens: English only and Other language have a credible difference.</span></i><div class="demo-row" title="English only · 13.1% (95% interval 13.1–13.1%)">
+      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="English only and Other language"><span class="sr">Greens: English only and Other language have a credible difference.</span></i><div class="demo-row" title="English only · 13.1% (95% interval 11.5–14.7%)">
         <span>English only</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:32.75%"></i>
-          <i class="demo-interval" style="left:32.75%;width:0%"></i>
-        </span><b>13.1%</b><span class="sr">Approximate 95% credible interval 13.1–13.1%</span>
-      </div><div class="demo-row" title="Other language · 16.7% (95% interval 16.7–16.7%)">
+          <i class="demo-interval" style="left:28.75%;width:8%"></i>
+        </span><b>13.1%</b><span class="sr">Approximate 95% credible interval 11.5–14.7%</span>
+      </div><div class="demo-row" title="Other language · 16.7% (95% interval 14.4–19.0%)">
         <span>Other language</span><span class="demo-track" aria-hidden="true">
           <i class="demo-fill" style="width:41.75%"></i>
-          <i class="demo-interval" style="left:41.75%;width:0%"></i>
-        </span><b>16.7%</b><span class="sr">Approximate 95% credible interval 16.7–16.7%</span>
+          <i class="demo-interval" style="left:35.99999999999999%;width:11.499999999999998%"></i>
+        </span><b>16.7%</b><span class="sr">Approximate 95% credible interval 14.4–19.0%</span>
       </div></div></section></div>
     <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Brackets connect selected groups whose 95% interval for the difference excludes zero.</p>
     <p class="src">AusPol Tracker estimates from YouGov and DemosAU, 24 November 2026.</p>
     <details><summary>View vote shares</summary><table><caption class="sr">Estimated first preferences by language at home, November 2026</caption>
     <thead><tr><th scope="col">Language at home</th><th scope="col">Labor</th><th scope="col">One Nation</th><th scope="col">Coalition</th><th scope="col">Greens</th></tr></thead>
     <tbody><tr><th scope="row">English only</th><td>25.7%</td><td>26.2%</td><td>24.8%</td><td>13.1%</td></tr><tr><th scope="row">Other language</th><td>32.6%</td><td>16.5%</td><td>24.7%</td><td>16.7%</td></tr></tbody></table></details>
+    </div></section>
+<section id="state-territory" class="sec chart-panel" aria-labelledby="heading-state-territory">
+    <i class="snap" aria-hidden="true"></i><div class="wrap">
+    <header class="hd"><h2 id="heading-state-territory">State/territory</h2><p class="dek">One Nation polls highest in Queensland</p></header>
+    <div class="demo-plots"><section class="demo-party" style="--party:var(--alp)">
+      <h3>Labor</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="NSW and Vic"><span class="sr">Labor: NSW and Vic have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Qld and SA"><span class="sr">Labor: Qld and SA have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="NSW and Qld"><span class="sr">Labor: NSW and Qld have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:2" title="Qld and WA"><span class="sr">Labor: Qld and WA have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:3" title="Qld and ACT/NT/Tas"><span class="sr">Labor: Qld and ACT/NT/Tas have a credible difference.</span></i><div class="demo-row" title="NSW · 28.4% (95% interval 25.9–30.9%)">
+        <span>NSW</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:71%"></i>
+          <i class="demo-interval" style="left:64.75%;width:12.5%"></i>
+        </span><b>28.4%</b><span class="sr">Approximate 95% credible interval 25.9–30.9%</span>
+      </div><div class="demo-row" title="Vic · 24.2% (95% interval 21.8–26.6%)">
+        <span>Vic</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:60.5%"></i>
+          <i class="demo-interval" style="left:54.5%;width:12%"></i>
+        </span><b>24.2%</b><span class="sr">Approximate 95% credible interval 21.8–26.6%</span>
+      </div><div class="demo-row" title="Qld · 24.1% (95% interval 21.6–26.6%)">
+        <span>Qld</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:60.25%"></i>
+          <i class="demo-interval" style="left:54%;width:12.5%"></i>
+        </span><b>24.1%</b><span class="sr">Approximate 95% credible interval 21.6–26.6%</span>
+      </div><div class="demo-row" title="SA · 31.4% (95% interval 27.8–35.0%)">
+        <span>SA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:78.5%"></i>
+          <i class="demo-interval" style="left:69.49999999999999%;width:18%"></i>
+        </span><b>31.4%</b><span class="sr">Approximate 95% credible interval 27.8–35.0%</span>
+      </div><div class="demo-row" title="WA · 27.9% (95% interval 24.8–31.0%)">
+        <span>WA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:69.75%"></i>
+          <i class="demo-interval" style="left:61.999999999999986%;width:15.5%"></i>
+        </span><b>27.9%</b><span class="sr">Approximate 95% credible interval 24.8–31.0%</span>
+      </div><div class="demo-row" title="ACT/NT/Tas · 32.3% (95% interval 26.2–38.4%)">
+        <span>ACT/NT/Tas</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:80.74999999999999%"></i>
+          <i class="demo-interval" style="left:65.49999999999999%;width:30.5%"></i>
+        </span><b>32.3%</b><span class="sr">Approximate 95% credible interval 26.2–38.4%</span>
+      </div></div></section><section class="demo-party" style="--party:var(--on)">
+      <h3>One Nation</h3><div class="demo-series"><i class="demo-arc" style="--start:1;--span:1" title="Vic and Qld"><span class="sr">One Nation: Vic and Qld have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Qld and SA"><span class="sr">One Nation: Qld and SA have a credible difference.</span></i><i class="demo-arc" style="--start:3;--span:1" title="SA and WA"><span class="sr">One Nation: SA and WA have a credible difference.</span></i><i class="demo-arc" style="--start:4;--span:1" title="WA and ACT/NT/Tas"><span class="sr">One Nation: WA and ACT/NT/Tas have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:2" title="NSW and Qld"><span class="sr">One Nation: NSW and Qld have a credible difference.</span></i><div class="demo-row" title="NSW · 24.3% (95% interval 21.6–27.0%)">
+        <span>NSW</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:60.75%"></i>
+          <i class="demo-interval" style="left:54%;width:13.5%"></i>
+        </span><b>24.3%</b><span class="sr">Approximate 95% credible interval 21.6–27.0%</span>
+      </div><div class="demo-row" title="Vic · 22.9% (95% interval 20.3–25.5%)">
+        <span>Vic</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:57.25%"></i>
+          <i class="demo-interval" style="left:50.74999999999999%;width:13%"></i>
+        </span><b>22.9%</b><span class="sr">Approximate 95% credible interval 20.3–25.5%</span>
+      </div><div class="demo-row" title="Qld · 30.2% (95% interval 27.3–33.1%)">
+        <span>Qld</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:75.5%"></i>
+          <i class="demo-interval" style="left:68.25%;width:14.5%"></i>
+        </span><b>30.2%</b><span class="sr">Approximate 95% credible interval 27.3–33.1%</span>
+      </div><div class="demo-row" title="SA · 20.9% (95% interval 17.9–23.9%)">
+        <span>SA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:52.25%"></i>
+          <i class="demo-interval" style="left:44.74999999999999%;width:15%"></i>
+        </span><b>20.9%</b><span class="sr">Approximate 95% credible interval 17.9–23.9%</span>
+      </div><div class="demo-row" title="WA · 25.2% (95% interval 22.2–28.2%)">
+        <span>WA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:63%"></i>
+          <i class="demo-interval" style="left:55.5%;width:15%"></i>
+        </span><b>25.2%</b><span class="sr">Approximate 95% credible interval 22.2–28.2%</span>
+      </div><div class="demo-row" title="ACT/NT/Tas · 18.1% (95% interval 14.3–21.9%)">
+        <span>ACT/NT/Tas</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:45.25000000000001%"></i>
+          <i class="demo-interval" style="left:35.75%;width:19%"></i>
+        </span><b>18.1%</b><span class="sr">Approximate 95% credible interval 14.3–21.9%</span>
+      </div></div></section><section class="demo-party" style="--party:var(--lnp)">
+      <h3>Coalition</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="NSW and Vic"><span class="sr">Coalition: NSW and Vic have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:1" title="Vic and Qld"><span class="sr">Coalition: Vic and Qld have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:2" title="Vic and SA"><span class="sr">Coalition: Vic and SA have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:3" title="Vic and WA"><span class="sr">Coalition: Vic and WA have a credible difference.</span></i><i class="demo-arc" style="--start:1;--span:4" title="Vic and ACT/NT/Tas"><span class="sr">Coalition: Vic and ACT/NT/Tas have a credible difference.</span></i><div class="demo-row" title="NSW · 23% (95% interval 20.5–25.5%)">
+        <span>NSW</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:57.5%"></i>
+          <i class="demo-interval" style="left:51.25%;width:12.5%"></i>
+        </span><b>23.0%</b><span class="sr">Approximate 95% credible interval 20.5–25.5%</span>
+      </div><div class="demo-row" title="Vic · 29.5% (95% interval 26.6–32.4%)">
+        <span>Vic</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:73.75%"></i>
+          <i class="demo-interval" style="left:66.5%;width:14.5%"></i>
+        </span><b>29.5%</b><span class="sr">Approximate 95% credible interval 26.6–32.4%</span>
+      </div><div class="demo-row" title="Qld · 23.8% (95% interval 21.2–26.4%)">
+        <span>Qld</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:59.5%"></i>
+          <i class="demo-interval" style="left:53%;width:13%"></i>
+        </span><b>23.8%</b><span class="sr">Approximate 95% credible interval 21.2–26.4%</span>
+      </div><div class="demo-row" title="SA · 22.5% (95% interval 19.4–25.6%)">
+        <span>SA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:56.25%"></i>
+          <i class="demo-interval" style="left:48.49999999999999%;width:15.5%"></i>
+        </span><b>22.5%</b><span class="sr">Approximate 95% credible interval 19.4–25.6%</span>
+      </div><div class="demo-row" title="WA · 24.8% (95% interval 21.7–27.9%)">
+        <span>WA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:62%"></i>
+          <i class="demo-interval" style="left:54.25%;width:15.5%"></i>
+        </span><b>24.8%</b><span class="sr">Approximate 95% credible interval 21.7–27.9%</span>
+      </div><div class="demo-row" title="ACT/NT/Tas · 20.4% (95% interval 15.6–25.2%)">
+        <span>ACT/NT/Tas</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:50.99999999999999%"></i>
+          <i class="demo-interval" style="left:38.99999999999999%;width:24%"></i>
+        </span><b>20.4%</b><span class="sr">Approximate 95% credible interval 15.6–25.2%</span>
+      </div></div></section><section class="demo-party" style="--party:var(--grn)">
+      <h3>Greens</h3><div class="demo-series"><i class="demo-arc" style="--start:0;--span:1" title="NSW and Vic"><span class="sr">Greens: NSW and Vic have a credible difference.</span></i><i class="demo-arc" style="--start:2;--span:1" title="Qld and SA"><span class="sr">Greens: Qld and SA have a credible difference.</span></i><i class="demo-arc" style="--start:0;--span:3" title="NSW and SA"><span class="sr">Greens: NSW and SA have a credible difference.</span></i><div class="demo-row" title="NSW · 11.4% (95% interval 9.9–12.9%)">
+        <span>NSW</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:28.5%"></i>
+          <i class="demo-interval" style="left:24.75%;width:7.5%"></i>
+        </span><b>11.4%</b><span class="sr">Approximate 95% credible interval 9.9–12.9%</span>
+      </div><div class="demo-row" title="Vic · 14.6% (95% interval 12.8–16.4%)">
+        <span>Vic</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:36.5%"></i>
+          <i class="demo-interval" style="left:32%;width:9%"></i>
+        </span><b>14.6%</b><span class="sr">Approximate 95% credible interval 12.8–16.4%</span>
+      </div><div class="demo-row" title="Qld · 12.5% (95% interval 10.7–14.3%)">
+        <span>Qld</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:31.25%"></i>
+          <i class="demo-interval" style="left:26.75%;width:9%"></i>
+        </span><b>12.5%</b><span class="sr">Approximate 95% credible interval 10.7–14.3%</span>
+      </div><div class="demo-row" title="SA · 16.1% (95% interval 13.6–18.6%)">
+        <span>SA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:40.25000000000001%"></i>
+          <i class="demo-interval" style="left:34.00000000000001%;width:12.5%"></i>
+        </span><b>16.1%</b><span class="sr">Approximate 95% credible interval 13.6–18.6%</span>
+      </div><div class="demo-row" title="WA · 13.6% (95% interval 11.5–15.7%)">
+        <span>WA</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:34%"></i>
+          <i class="demo-interval" style="left:28.75%;width:10.5%"></i>
+        </span><b>13.6%</b><span class="sr">Approximate 95% credible interval 11.5–15.7%</span>
+      </div><div class="demo-row" title="ACT/NT/Tas · 13.5% (95% interval 9.9–17.1%)">
+        <span>ACT/NT/Tas</span><span class="demo-track" aria-hidden="true">
+          <i class="demo-fill" style="width:33.75%"></i>
+          <i class="demo-interval" style="left:24.75%;width:18%"></i>
+        </span><b>13.5%</b><span class="sr">Approximate 95% credible interval 9.9–17.1%</span>
+      </div></div></section></div>
+    <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Brackets connect selected groups whose 95% interval for the difference excludes zero.</p>
+    <p class="src">AusPol Tracker estimates from YouGov, Resolve and Roy Morgan, 24 November 2026.</p>
+    <details><summary>View vote shares</summary><table><caption class="sr">Estimated first preferences by state/territory, November 2026</caption>
+    <thead><tr><th scope="col">State/territory</th><th scope="col">Labor</th><th scope="col">One Nation</th><th scope="col">Coalition</th><th scope="col">Greens</th></tr></thead>
+    <tbody><tr><th scope="row">NSW</th><td>28.4%</td><td>24.3%</td><td>23%</td><td>11.4%</td></tr><tr><th scope="row">Vic</th><td>24.2%</td><td>22.9%</td><td>29.5%</td><td>14.6%</td></tr><tr><th scope="row">Qld</th><td>24.1%</td><td>30.2%</td><td>23.8%</td><td>12.5%</td></tr><tr><th scope="row">SA</th><td>31.4%</td><td>20.9%</td><td>22.5%</td><td>16.1%</td></tr><tr><th scope="row">WA</th><td>27.9%</td><td>25.2%</td><td>24.8%</td><td>13.6%</td></tr><tr><th scope="row">ACT/NT/Tas</th><td>32.3%</td><td>18.1%</td><td>20.4%</td><td>13.5%</td></tr></tbody></table></details>
     </div></section>
 </main>
 <script>

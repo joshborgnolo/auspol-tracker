@@ -53,7 +53,11 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
     ok(css.includes(`.finding .party-name.${key}{color:var(--${token})}`), `demographics: ${key}'s finding text uses the Dawn ${token} colour`);
   }
   const findings = demographicsMarkup.findings().split('<div id="finding-').slice(1);
-  eq(findings.length, 5, "one comparison per facet");
+  eq(findings.length, 6, "one comparison per facet");
+  const panels = demographicsMarkup.panels();
+  const widths = [...panels.matchAll(/class="demo-interval" style="left:[^;]+;width:([\d.]+)%"/g)];
+  eq(widths.length, 88, "one interval per demographic estimate");
+  ok(widths.every(match => Number(match[1]) > 0), "every plotted interval has positive width");
   for (const finding of findings)
     eq((finding.match(/class="party-name (alp|onp|lnp|grn)"/g) || []).length, 2, "both comparison parties carry their colour class");
 }
