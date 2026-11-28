@@ -114,6 +114,35 @@ jobs:
             "Outside estimates: a comparator mirror is stale" \
             "$BODY" || echo "::warning::could not file the ci-alert issue"
 
+      # data/life-satisfaction.json is hand-filed from ANUpoll, AIHW and ABS
+      # releases; stale (exit 3) files an issue and stays green.
+      - name: Check the life satisfaction readings are fresh
+        id: life
+        if: always()
+        run: |
+          set +e
+          OUT="$(node .build/check-life-satisfaction.mjs 2>&1)"
+          CODE=$?
+          echo "$OUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          if [ "$CODE" -ne 0 ]; then
+            echo "::warning::life satisfaction freshness check exit $CODE — see the ci-alert issue or the log above"
+            echo "$OUT" > life-detail.txt
+          fi
+          exit 0
+
+      - name: File a ci-alert issue for stale life satisfaction readings
+        if: always() && steps.life.outputs.code == '3'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DETAIL="$(cat life-detail.txt 2>/dev/null || true)"
+          BODY="National mood's life satisfaction view is hand-filed. File any new release in data/life-satisfaction.json (with its verbatim quote), set \"checked\" to the day you looked, then rebuild. [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+          BODY="${BODY}"$'\n\n```\n'"${DETAIL}"$'\n```'
+          bash .build/alert-issue.sh \
+            "Life satisfaction: readings are due a check" \
+            "$BODY" || echo "::warning::could not file the ci-alert issue"
+
       - name: File a ci-alert issue for provisionally covered waves
         if: steps.doctor.outputs.verdict == '3'
         env:

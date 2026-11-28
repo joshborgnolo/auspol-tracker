@@ -1100,9 +1100,9 @@ function primScene(narrow){
     if(span<=4.6&&!g)pastPolls(a,b,(r,x,t,out)=>{const poll={who:r[1],when:r[2]?xMonth(x,true):fdate(r[0])};PK.forEach((k,j)=>{const v=r[3+j];if(v!=null)S.dots.push({x,y:v,color:COLOR(k),poll,txt:ABBR[k]+' '+f1(v)})})});
     if(!cur)S.ends=[];
   }
-  /* governments behind a window longer than a term; their names stand in for the elections */
-  if(span>8)S.govs=govBlocks(a,b);
-  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  /* government fills stay under long-window event labels, not in place of them */
+  if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
+  S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const ys=[...(S.yAlt||[]),...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.map(p=>p.hi)),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=0;S.y1=Math.max(40,Math.ceil(Math.max(...ys,0)/10)*10);
   return S;
@@ -1165,8 +1165,8 @@ function tppScene(narrow){
     if(span<=4.6)pastPolls(a,b,(r,x)=>{const v=r[8];if(v!=null)S.dots.push({x,y:v,color:RCOL.lnp,poll:{who:r[1],when:r[2]?xMonth(x,true):fdate(r[0])},txt:f1(v)})});
     if(!cur)S.ends=[];
   }
-  if(span>8)S.govs=govBlocks(a,b);
-  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
+  S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const ys=[50,...(S.yAlt||[]),...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=Math.floor((Math.min(...ys)+.3)/5)*5;S.y1=Math.ceil((Math.max(...ys)-.3)/5)*5;
   if(S.y1-S.y0<10)S.y1=S.y0+10;

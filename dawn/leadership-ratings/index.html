@@ -844,7 +844,7 @@ function chart(o){
        only a name with room on neither row falls back to the party. A phone has the shading alone: names
        stacked three rows deep couldn't be matched to their terms */
     let GV=[];const GVF=11.5;
-    if(S.govs&&!evs.length){const fz=`500 ${GVF}px`,gap=8,rows=[[],[],[]];
+    if(S.govs&&(!evs.length||S.govShade)){const fz=`500 ${GVF}px`,gap=8,rows=[[],[],[]];
       const free=(r,a,b)=>rows[r].every(([p,q])=>b+gap<=p||a>=q+gap);
       /* each government's prime ministers: inside its term where they fit; the rest, narrowest term first,
          beside their term on the lowest row with room; the party only where no row has */
@@ -857,7 +857,8 @@ function chart(o){
       /* nearest free spot along the lowest row that still overlaps the term: the shortest full form, then the first prime minister, then the party */
       B.filter(v=>!v.nm).sort((u,v)=>(u.gb-u.ga)-(v.gb-v.ga)).forEach(v=>{place(v,v.c.slice().sort((a,b)=>tw(a,fz)-tw(b,fz)))||place(v,[v.g.pms[0]])||place(v,[v.g.gov==='alp'?'Labor':'Coalition'])});
       GV=B;
-      if(W<600)B.forEach(v=>v.nm='');else EVH=22+14*Math.max(0,...GV.filter(v=>v.nm).map(v=>v.r))}
+      if(evs.length)B.forEach(v=>v.nm='');
+      else if(W<600)B.forEach(v=>v.nm='');else EVH=22+14*Math.max(0,...GV.filter(v=>v.nm).map(v=>v.r))}
     const MT=TIPH+EVH+(evs.length&&!narrow?8:0),MB=24,PH=H-MT-MB,y=v=>MT+PH*(S.y1-v)/(S.y1-S.y0);
     let s='';
     GV.forEach(({g,ga,gb,nm,r,cx})=>{const col=`var(--${g.gov==='alp'?'alp':'lnp'})`;

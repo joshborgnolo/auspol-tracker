@@ -1,5 +1,5 @@
 {
-  "_about": "Life satisfaction for the National mood section, hand-filed from primary reports. Every mean retains its survey's own scale, sample and panel; nothing is pooled, lean-adjusted or rescaled. Readings with only a year sit at mid-year. `quote` is the verbatim source sentence or table text proving that reading; `source` identifies it. DemosAU's separate 0–100 snapshot is derived from demosau-one-offs.json by gen-data, not duplicated here.",
+  "_about": "Life satisfaction for the National mood section, hand-filed from primary reports. Every reading keeps its survey’s own printed figure; gen-data’s model (life-model.mjs) reads them without editing them. `date` is the month (a year only for HILDA’s annual waves, placed at the series’ midMonth). `quote` is the verbatim source text proving that reading (\" … \" joins two passages of one document); `source` identifies it. `checked` is when someone last looked for new releases at each source: .build/check-life-satisfaction.mjs reads it. DemosAU’s separate 0–100 snapshot is derived from demosau-one-offs.json by gen-data, not duplicated here.",
   "series": [
     {
       "id": "anupoll",
@@ -10,7 +10,7 @@
       "source": "https://polis.cass.anu.edu.au/research/publications/steady-not-recovering-wellbeing-democratic-attitudes-and-interpersonal-trust",
       "question": "Overall, how satisfied are you with life as a whole these days?",
       "answers": "0 means not at all satisfied and 10 means completely satisfied.",
-      "method": "ANUpoll’s national adult mean, not the ABS/HILDA series. The probability-recruited Life in Australia panel ran until January 2024; the opt-in ORU online panel began in October 2024. The empty months are intentional: only waves whose exact means appear in a primary text are filed, never values eyeballed from ANU’s image-only trend chart.",
+      "method": "ANUpoll’s national adult mean. The probability-recruited Life in Australia panel carried it until early 2024; from October 2024 it runs on the Online Research Unit’s opt-in panel. Only waves whose mean is printed to two decimals in an ANU text are filed: never values read off ANU’s trend chart, so some waves are missing.",
       "panels": [
         {
           "id": "lia",
@@ -25,6 +25,20 @@
       ],
       "readings": [
         {
+          "date": "2019-10",
+          "v": 7.05,
+          "panel": "lia",
+          "quote": "The average value in August 2021 was 6.52, far lower than the pre-COVID peak (in October 2019) of 7.05",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_paper_-_August_2021.pdf"
+        },
+        {
+          "date": "2020-01",
+          "v": 6.9,
+          "panel": "lia",
+          "quote": "In January 2020, the average level of life satisfaction in Australia was 6.90 out of a possible 10.0.",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Mental_health_and_wellbeing_during_the_COVID-19_period.pdf"
+        },
+        {
           "date": "2020-04",
           "v": 6.52,
           "n": 3155,
@@ -33,11 +47,113 @@
           "source": "https://www.anu.edu.au/news/all-news/most-australians-believe-life-was-better-50-years-ago-anupoll"
         },
         {
+          "date": "2020-10",
+          "v": 6.66,
+          "panel": "lia",
+          "quote": "There was a significant and substantial improvement in life satisfaction between October 2020 to November 2020 – from an average of 6.66 to 6.99 over the period",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_wellbeing_outcomes_during_the_COVID-19_pandemic_November_2020.pdf"
+        },
+        {
+          "date": "2020-11",
+          "v": 6.99,
+          "panel": "lia",
+          "quote": "Indeed, the level of life satisfaction in November 2020 (6.99) was slightly higher than it was in January 2020.",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Mental_health_and_wellbeing_during_the_COVID-19_period.pdf"
+        },
+        {
+          "date": "2021-01",
+          "v": 6.95,
+          "panel": "lia",
+          "quote": "6.99 on a scale of 0 to 10 in November 2020 and 6.95 in January 2021.",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_wellbeing_outcomes_during_the_COVID-19_pandemic_January_2021.pdf"
+        },
+        {
+          "date": "2021-04",
+          "v": 6.87,
+          "panel": "lia",
+          "n": 3286,
+          "quote": "This is approximately one-fifth of a standard deviation lower than the April 2021 average (6.87)",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_paper_-_August_2021.pdf"
+        },
+        {
+          "date": "2021-08",
+          "v": 6.52,
+          "panel": "lia",
+          "n": 3135,
+          "quote": "The average value in August 2021 was 6.52",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_paper_-_August_2021.pdf"
+        },
+        {
+          "date": "2021-10",
+          "v": 6.63,
+          "panel": "lia",
+          "n": 3474,
+          "quote": "statistically equivalent to the value observed in October 2021 (6.63).",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_paper_-_January_2022.pdf"
+        },
+        {
+          "date": "2022-01",
+          "v": 6.61,
+          "panel": "lia",
+          "n": 3472,
+          "quote": "In January 2022, the average level of life satisfaction was 6.61, on a scale from 0 to 10",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_paper_-_January_2022.pdf"
+        },
+        {
+          "date": "2022-05",
+          "v": 6.77,
+          "panel": "lia",
+          "quote": "far lower than the value of 6.77 in May 2022 just after the last election",
+          "source": "https://politicsir.cass.anu.edu.au/files/docs/2025/4/Hope-Hardship-and-Democratic-Confidence.pdf"
+        },
+        {
+          "date": "2022-10",
+          "v": 6.72,
+          "panel": "lia",
+          "n": 3468,
+          "quote": "life satisfaction has shown a steady increase with it being 6.72 in October 2022",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Tracking_paper_-_October_2022_-_For_web.pdf"
+        },
+        {
           "date": "2023-01",
           "v": 6.78,
           "panel": "lia",
-          "quote": "Average life satisfaction reached a then-low of 6.52 in April 2020, fluctuated during the COVID-19 pandemic, and rose back to 6.78 by January 2023.",
-          "source": "https://www.anu.edu.au/news/all-news/most-australians-believe-life-was-better-50-years-ago-anupoll"
+          "n": 3370,
+          "quote": "life satisfaction has shown a steady increase reaching 6.78 in January 2023",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2025/6/Taking_stock_-_January_2023_Tracking_paper_0.pdf"
+        },
+        {
+          "date": "2025-01",
+          "v": 6.45,
+          "panel": "oru",
+          "n": 3514,
+          "field": "31 January – 12 February 2025",
+          "quote": "Life satisfaction, all Australians, October 2019 to January 2025 … mean satisfaction falling to 6.45 out of 10",
+          "source": "https://politicsir.cass.anu.edu.au/files/docs/2025/3/Erosion-of-hope---For-web.pdf"
+        },
+        {
+          "date": "2025-03",
+          "v": 6.35,
+          "panel": "oru",
+          "n": 3608,
+          "field": "28 March – 8 April 2025",
+          "quote": "Life satisfaction, all Australians, October 2019 to March/April 2025 … Average life satisfaction has fallen to 6.35 on a 0",
+          "source": "https://politicsir.cass.anu.edu.au/files/docs/2025/4/Hope-Hardship-and-Democratic-Confidence.pdf"
+        },
+        {
+          "date": "2025-05",
+          "v": 6.49,
+          "panel": "oru",
+          "field": "May 2025",
+          "quote": "Life satisfaction, all Australians, October 2019 to May 2025 … a statistically significant increase in life satisfaction, to an average of 6.49.",
+          "source": "https://politicsir.cass.anu.edu.au/files/docs/2025/9/Resilient-Democracy---Discussion-Paper-07---Biddle---Final-%2528updated%2529.pdf"
+        },
+        {
+          "date": "2025-12",
+          "v": 6.46,
+          "panel": "oru",
+          "quote": "the December 2025 ANUpoll … the higher life satisfaction level observed in December 2025 (6.46)",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2026/4/Holding-together-Just---March-ANUpoll---For-web.pdf"
         },
         {
           "date": "2026-03",
@@ -62,26 +178,161 @@
     {
       "id": "hilda",
       "house": "HILDA",
-      "shortMethod": "HILDA / ABS custom analysis",
+      "shortMethod": "HILDA, as published by AIHW",
       "scaleMax": 10,
       "role": "line",
-      "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction",
+      "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction",
       "questionSource": "https://hildaodd.app.unimelb.edu.au/VariableDetails.aspx?varn=losat&varw=1",
       "question": "All things considered, how satisfied are you with your life?",
       "answers": "0 to 10, where 0 means not at all satisfied and 10 completely satisfied.",
-      "method": "Annual Household, Income and Labour Dynamics in Australia Survey readings, printed to one decimal in the ABS’s custom analysis. HILDA tracks the same households over time rather than taking a fresh ANUpoll sample; 2014–2023 is the run published on this ABS table, not the complete HILDA history.",
+      "method": "Annual means from the Household, Income and Labour Dynamics in Australia Survey, waves 1–24 (2001–2024), people aged 15 and over, as the Australian Institute of Health and Welfare prints them to two decimals. HILDA follows the same households year after year, so it is not a fresh sample. Most interviews are done late in the winter and in spring.",
       "readings": [
-        { "date": "2014", "v": 7.9, "quote": "2014\n7.6\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2015", "v": 7.9, "quote": "2015\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2016", "v": 7.9, "quote": "2016\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2017", "v": 7.9, "quote": "2017\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2018", "v": 7.9, "quote": "2018\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2019", "v": 7.9, "quote": "2019\n7.5\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2020", "v": 7.9, "quote": "2020\n7.2\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2021", "v": 7.9, "quote": "2021\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2022", "v": 7.9, "quote": "2022\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
-        { "date": "2023", "v": 7.9, "quote": "2023\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" }
-      ]
+        {
+          "date": "2001",
+          "v": 7.95,
+          "quote": "2001 | 7.95",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2002",
+          "v": 7.86,
+          "quote": "2002 | 7.86",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2003",
+          "v": 7.96,
+          "quote": "2003 | 7.96",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2004",
+          "v": 7.92,
+          "quote": "2004 | 7.92",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2005",
+          "v": 7.87,
+          "quote": "2005 | 7.87",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2006",
+          "v": 7.84,
+          "quote": "2006 | 7.84",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2007",
+          "v": 7.88,
+          "quote": "2007 | 7.88",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2008",
+          "v": 7.88,
+          "quote": "2008 | 7.88",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2009",
+          "v": 7.83,
+          "quote": "2009 | 7.83",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2010",
+          "v": 7.85,
+          "quote": "2010 | 7.85",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2011",
+          "v": 7.9,
+          "quote": "2011 | 7.9",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2012",
+          "v": 7.9,
+          "quote": "2012 | 7.9",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2013",
+          "v": 7.89,
+          "quote": "2013 | 7.89",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2014",
+          "v": 7.87,
+          "quote": "2014 | 7.87",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2015",
+          "v": 7.89,
+          "quote": "2015 | 7.89",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2016",
+          "v": 7.89,
+          "quote": "2016 | 7.89",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2017",
+          "v": 7.86,
+          "quote": "2017 | 7.86",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2018",
+          "v": 7.89,
+          "quote": "2018 | 7.89",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2019",
+          "v": 7.93,
+          "quote": "2019 | 7.93",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2020",
+          "v": 7.91,
+          "quote": "2020 | 7.91",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2021",
+          "v": 7.92,
+          "quote": "2021 | 7.92",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2022",
+          "v": 7.94,
+          "quote": "2022 | 7.94",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2023",
+          "v": 7.92,
+          "quote": "2023 | 7.92",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        },
+        {
+          "date": "2024",
+          "v": 7.98,
+          "quote": "2024 | 7.98",
+          "source": "https://www.aihw.gov.au/mental-health/topic-areas/health-wellbeing/life-satisfaction"
+        }
+      ],
+      "midMonth": "09"
     },
     {
       "id": "abs-gss",
@@ -89,35 +340,42 @@
       "shortMethod": "General Social Survey",
       "scaleMax": 10,
       "role": "dot",
-      "source": "https://www.abs.gov.au/statistics/people/people-and-communities/general-social-survey-summary-results-australia/latest-release",
+      "source": "https://www.abs.gov.au/statistics/people/people-and-communities/general-social-survey-summary-results-australia/2025",
       "question": "Overall, on a scale from 0 to 10, how satisfied are you with life as a whole these days?",
       "answers": "0 means not at all satisfied and 10 completely satisfied.",
-      "method": "The ABS General Social Survey, Australians aged 15 and over. Only 2014, 2019, 2020 and 2025 are printed here. The 2020 survey moved from face-to-face to online and telephone interviewing during COVID-19, which the ABS says may have affected comparisons; 2025 fieldwork was in May and June.",
+      "method": "The ABS General Social Survey, people aged 15 and over: 2014, 2019, 2020 and 2025. The 2020 survey moved from face-to-face to online and telephone interviewing during COVID-19, which the ABS says may have affected comparisons. Sample sizes are fully responding households.",
       "readings": [
         {
-          "date": "2014",
+          "date": "2014-05",
           "v": 7.6,
           "quote": "overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
-          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities/general-social-survey-summary-results-australia/2025",
+          "field": "March – June 2014",
+          "n": 12932
         },
         {
-          "date": "2019",
+          "date": "2019-06",
           "v": 7.5,
           "quote": "overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
-          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities/general-social-survey-summary-results-australia/2025",
+          "field": "29 April – 20 July 2019",
+          "n": 3535
         },
         {
-          "date": "2020",
+          "date": "2020-07",
           "v": 7.2,
           "quote": "overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
-          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities/general-social-survey-summary-results-australia/2025",
+          "field": "15 June – 5 September 2020",
+          "n": 5304
         },
         {
-          "date": "2025",
+          "date": "2025-05",
           "v": 7.1,
-          "field": "May – June 2025",
+          "field": "1 May – 28 June 2025",
           "quote": "Of Australians aged 15 years and over in 2025: overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
-          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities/general-social-survey-summary-results-australia/2025",
+          "n": 13302
         }
       ]
     },
@@ -143,5 +401,6 @@
         }
       ]
     }
-  ]
+  ],
+  "checked": "2026-11-28"
 }

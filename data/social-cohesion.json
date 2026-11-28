@@ -1,0 +1,8 @@
+{
+  "secSource":"https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf#page=27",
+  "secColumns":["month","goodOrBetter","poorOrVeryPoor"],
+  "sec":[["2024-07",39,24],["2024-09",43,20],["2024-11",37,25],["2025-02",45,23],["2025-04",49,19],["2025-07",38,27],["2025-09",33,32],["2025-11",39,28],["2026-02",33,33],["2026-05",33,32],["2026-07",32,32],["2026-09",33,30],["2026-11",38,27]],
+  "scanlonSource":"https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf#page=36",
+  "domains":["Overall","Belonging","Worth","Social inclusion and justice","Participation","Acceptance"],
+  "scanlon":[[2018,82,85,77,88,95,63],[2019,84,86,80,93,93,67],[2020,90,88,84,112,96,68],[2021,88,84,82,98,95,82],[2022,83,81,78,86,97,74],[2023,78,78,75,77,96,65],[2024,78,77,74,74,100,63],[2025,78,78,75,77,101,60],[2026,78,79,75,76,98,60]]
+}
