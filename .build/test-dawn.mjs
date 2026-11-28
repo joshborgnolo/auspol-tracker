@@ -588,6 +588,10 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(built.includes('id="life-svg"') && built.includes("wLife=windowedChart"), "mood: life satisfaction has its own chart window");
   ok(built.includes("S.dots.push({x:r.x,y:r.v") && built.includes("S.stops.push({x:r.x"), "mood: every reading draws and keyboard-reads on its published basis");
   ok(built.includes('id="life-sources"') && built.includes('id="life-table"') && built.includes('id="demo-v"'), "mood: question notes, the accessible table and snapshot are present");
+  eq((built.match(/S\.govShade=1/g) || []).length, 2, "direction and trust opt into retained government shading under long-window events");
+  ok(built.includes("S.events=winEvents("), "mood: those long views no longer discard their event data");
+  ok(built.includes("S.govs&&(!evs.length||S.govShade)"), "the shared renderer can preserve government fills under event rules");
+  ok(built.includes("if(evs.length)B.forEach(v=>v.nm='')"), "government names yield to event names when both would collide");
   ok(built.includes('DemosAU’s separate 0–100 index is not rescaled into this chart.'), "mood: DemosAU never enters the common mean scale");
   ok(/name="robots" content="noindex"/.test(built), "mood: unlisted");
   ok(built.includes("direct:true};") && built.includes("q:'?facet=direction'"), "mood: a pressed dot opens its poll on the Direction view");

@@ -240,8 +240,8 @@ function dirScene(narrow){
     if(dots)for(const r of DATA.pastPolls){const x=isoX(r[0]);if(x<a||x>b)continue;dot(x,r[2],r[3],r[4],poll(r[0]+'|'+r[1],r[1],fdate(r[0]),''))}
     if(!cur)S.ends=[];
   }
-  if(span>8)S.govs=govBlocks(a,b);
-  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
+  S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   axis(S,[...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(q=>q.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...(S.lines.length?[]:[30,50])],10);
   return S;
 }
@@ -273,8 +273,8 @@ function trustScene(){
     S.stops.push({x:m.x,label:ymWords(m.ym),sub:ev?ev.s:'',items})}
   const last=M[M.length-1];
   if(cur&&inW(last.x)){S.ends=[{color:TC,y:last.y,name:'Trust',abbr:'Trust',v:last.y}];S.endX=last.x}
-  if(span>8)S.govs=govBlocks(a,b);
-  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
+  S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const shown=S.bands.flatMap(q=>q.pts.filter(p=>inW(p.x)).flatMap(p=>[p.lo,p.hi]));
   axis(S,[...shown,...S.dots.map(d=>d.y),...extras.flatMap(e=>e.pts.filter(p=>inW(p.x)).map(p=>p.y)),...(shown.length?[]:[20,40])],10);
   return S;
