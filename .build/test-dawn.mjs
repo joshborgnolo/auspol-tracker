@@ -862,6 +862,10 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "opinion: every placeholder filled");
   ok(built.includes(opinionLede(src, newestPublished(src))), "opinion: today's lede");
   const data = JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]);
+  const im = data.immigration;
+  ok(im.rows.some(r => r.key === "scanlon-telephone") && im.rows.some(r => r.key === "scanlon-current"), "immigration: separate Scanlon methods");
+  ok(im.trend.every((r,i) => (!i || r.x > im.trend[i-1].x) && 0 < r.lo && r.lo < r.v && r.v < r.hi && r.hi < 100), "immigration: chronological estimates within their probability intervals");
+  ok(im.scores.some(r => r.last != null) && im.scores.every(r => Number.isFinite(r.expanded.v) && Number.isFinite(r.direct.v)), "immigration: both models tested on the same targets");
   eq(JSON.stringify(data.slides), JSON.stringify(slides), "opinion: the page's slides are today's");
   const po = built.match(/href="\.\.\/(po\.[0-9a-f]{8}\.json)"/)[1], app = built.match(/src="\.\.\/(po-app\.[0-9a-f]{8}\.js)"/)[1];
   eq(fs.readFileSync(path.join(ROOT, "dawn", po), "utf8"), fs.readFileSync(path.join(A, "oneoffs-source.json"), "utf8"), "opinion: its sidecar is the site's own");
