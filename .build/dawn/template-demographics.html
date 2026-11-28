@@ -56,6 +56,14 @@
 .chart-panel th,.chart-panel td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--rule)}
 .chart-panel th:first-child{text-align:left}
 @media(max-width:650px){.chart-panel th,.chart-panel td{padding:5px 3px}.chart-panel table{font-size:12px}}
+.shifts{height:auto;min-height:100svh;overflow:visible}
+.shifts table{width:100%;max-width:55rem;border-collapse:collapse;margin:18px 0;font-size:15px;font-variant-numeric:tabular-nums}
+.shifts td,.shifts th{padding:8px 6px;border-bottom:1px solid var(--rule);text-align:right}
+.shifts th:first-child,.shifts td:first-child{text-align:left;padding-left:0}
+.shifts td small{display:block;color:var(--mute)}
+.shifts .facet-name{text-align:left;font:600 17px var(--sans);padding-top:18px}
+.shifts .dek{max-width:67ch}
+@media(max-width:560px){.shifts td,.shifts th{padding:7px 3px;font-size:13px}.shifts th:first-child{width:44%}}
 </style>
 </head>
 <body>
@@ -105,6 +113,7 @@
   </div>
 </section>
 {{panels}}
+{{shifts}}
 </main>
 <script>
 {

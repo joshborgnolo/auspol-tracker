@@ -1,4 +1,4 @@
-import { demographicsMarkup } from "./demographics.mjs";
+import { demographicsMarkup, shiftsMarkup } from "./demographics.mjs";
 /* /dawn/ – a trial design for the site (the owner's "auspol.html" mock-up,
    Nov 2026), wired to the site's own data and linked from nowhere.
 
@@ -273,7 +273,11 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     return file;
   };
   const demographics = sunPage({ asset: "dawn-data.json", dir: "demographics", template: "template-demographics.html",
-    fill: {}, markup: demographicsMarkup });
+    fill: {}, markup: { ...demographicsMarkup, shifts: () => {
+      const context = { window: {} };
+      vm.runInNewContext(fs.readFileSync(path.join(assets, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8"), context);
+      return shiftsMarkup(context.window.AUSPOL);
+    } } });
   const leadFile = sunPage({ asset: "dawn-leaders.json", template: "template-leaders.html", dir: "leadership-ratings",
     fill: { leadersHead: (L) => leadersHead(L).head, leadersDek, ppmHead, ppmDek, favHead: (L) => favHead(L).head, favDek } });
   const moodFile = sunPage({ asset: "dawn-mood.json", template: "template-mood.html", dir: "mood",

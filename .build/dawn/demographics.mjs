@@ -127,3 +127,29 @@ export const demographicsMarkup = {
   findings: () => charts.map(finding).join("\n"),
   panels: () => charts.map(panel).join("\n"),
 };
+
+// Use the main site's published passes. Its Holm test uses unrounded probabilities.
+export function shiftsMarkup({ demoGaps, demoTrend }) {
+  const facets = { age: "Age group", generation: "Generation", gender: "Gender", education: "Education",
+    state: "State/territory", location: "Seat type", housing: "Housing tenure", language: "Language at home",
+    working: "Employment", income: "Income" };
+  const names = { alp: "Labor", lnp: "Coalition", onp: "One Nation", grn: "Greens", oth: "Others" };
+  const month = ym => new Intl.DateTimeFormat("en-AU", { month: "short", year: "numeric", timeZone: "UTC" })
+    .format(new Date(ym + "-01T00:00:00Z"));
+  const sections = Object.entries(demoGaps || {}).filter(([, family]) => family.pass.length).map(([id, family]) => {
+    const rows = family.pass.toSorted((x, y) => Math.abs(y.lr) - Math.abs(x.lr)).map(r => {
+      const period = r.model ? demoTrend[r.party].rows.find(row => row.set === id && row.group === r.a) : r;
+      const change = Math.round(100 * Math.expm1(r.lr));
+      return `<tr><td>${r.a} / ${r.b}<small>${names[r.party]} · ${month(period.from)}–${month(period.to)}</small></td>
+        <td>${r.r0.toFixed(2)}×</td><td>${r.r1.toFixed(2)}×</td><td>${change > 0 ? "+" : "−"}${Math.abs(change)}%</td></tr>`;
+    }).join("");
+    return `<tbody><tr><th class="facet-name" colspan="4" scope="rowgroup">${facets[id] || id}</th></tr>${rows}</tbody>`;
+  }).join("");
+  return `<section id="demographic-shifts" class="sec shifts" aria-labelledby="shifts-heading">
+    <i class="snap" aria-hidden="true"></i><div class="wrap"><header class="hd"><h2 id="shifts-heading">Demographic shifts</h2>
+    <p class="dek">Where support for a party has shifted between two groups. Each ratio divides the first group’s vote share by the second’s. At 1×, the two groups back the party equally.</p></header>
+    ${sections ? `<table aria-labelledby="shifts-heading"><thead><tr><th scope="col">Groups and party</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Change</th></tr></thead>${sections}</table>` :
+      `<p>${demoGaps ? "No shifts passed the significance test." : "Shift estimates are unavailable."}</p>`}
+    <p class="src">Change is the percentage change in relative support. Only shifts passing the main site’s 5% Holm-adjusted test across all parties and group pairs within each demographic are shown.</p>
+    </div></section>`;
+}

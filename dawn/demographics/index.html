@@ -375,6 +375,14 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .chart-panel th,.chart-panel td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--rule)}
 .chart-panel th:first-child{text-align:left}
 @media(max-width:650px){.chart-panel th,.chart-panel td{padding:5px 3px}.chart-panel table{font-size:12px}}
+.shifts{height:auto;min-height:100svh;overflow:visible}
+.shifts table{width:100%;max-width:55rem;border-collapse:collapse;margin:18px 0;font-size:15px;font-variant-numeric:tabular-nums}
+.shifts td,.shifts th{padding:8px 6px;border-bottom:1px solid var(--rule);text-align:right}
+.shifts th:first-child,.shifts td:first-child{text-align:left;padding-left:0}
+.shifts td small{display:block;color:var(--mute)}
+.shifts .facet-name{text-align:left;font:600 17px var(--sans);padding-top:18px}
+.shifts .dek{max-width:67ch}
+@media(max-width:560px){.shifts td,.shifts th{padding:7px 3px;font-size:13px}.shifts th:first-child{width:44%}}
 </style>
 </head>
 <body>
@@ -705,6 +713,31 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <details><summary>View vote shares</summary><table><caption class="sr">Estimated first preferences by language at home, November 2026</caption>
     <thead><tr><th scope="col">Language at home</th><th scope="col">Labor</th><th scope="col">One Nation</th><th scope="col">Coalition</th><th scope="col">Greens</th></tr></thead>
     <tbody><tr><th scope="row">English only</th><td>25.7%</td><td>26.2%</td><td>24.8%</td><td>13.1%</td></tr><tr><th scope="row">Other language</th><td>32.6%</td><td>16.5%</td><td>24.7%</td><td>16.7%</td></tr></tbody></table></details>
+    </div></section>
+<section id="demographic-shifts" class="sec shifts" aria-labelledby="shifts-heading">
+    <i class="snap" aria-hidden="true"></i><div class="wrap"><header class="hd"><h2 id="shifts-heading">Demographic shifts</h2>
+    <p class="dek">Where support for a party has shifted between two groups. Each ratio divides the first group’s vote share by the second’s. At 1×, the two groups back the party equally.</p></header>
+    <table aria-labelledby="shifts-heading"><thead><tr><th scope="col">Groups and party</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Change</th></tr></thead><tbody><tr><th class="facet-name" colspan="4" scope="rowgroup">Age group</th></tr><tr><td>18–34 / 35–54<small>Others · May 2025–Nov 2026</small></td>
+        <td>0.76×</td><td>0.94×</td><td>+24%</td></tr><tr><td>18–34 / 55+<small>Others · May 2025–Nov 2026</small></td>
+        <td>0.80×</td><td>0.99×</td><td>+23%</td></tr><tr><td>35–54 / 55+<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>1.02×</td><td>0.87×</td><td>−15%</td></tr></tbody><tbody><tr><th class="facet-name" colspan="4" scope="rowgroup">Generation</th></tr><tr><td>Gen Z / Boomers<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>0.21×</td><td>0.39×</td><td>+85%</td></tr><tr><td>Gen Z / Boomers<small>Others · May 2025–Nov 2026</small></td>
+        <td>0.72×</td><td>1.29×</td><td>+79%</td></tr><tr><td>Gen Z / Gen X<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>0.21×</td><td>0.38×</td><td>+78%</td></tr><tr><td>Gen Z / Gen X<small>Others · May 2025–Nov 2026</small></td>
+        <td>0.63×</td><td>1.09×</td><td>+72%</td></tr><tr><td>Gen Z / Millennials<small>Others · May 2025–Nov 2026</small></td>
+        <td>0.68×</td><td>1.05×</td><td>+56%</td></tr><tr><td>Gen Z / Millennials<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>0.31×</td><td>0.48×</td><td>+55%</td></tr></tbody><tbody><tr><th class="facet-name" colspan="4" scope="rowgroup">Education</th></tr><tr><td>TAFE or trade / University<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>2.41×</td><td>1.79×</td><td>−26%</td></tr><tr><td>Year 12 or less / University<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>2.19×</td><td>1.76×</td><td>−20%</td></tr><tr><td>Year 12 or less / University<small>Coalition · May 2025–Nov 2026</small></td>
+        <td>1.09×</td><td>0.92×</td><td>−16%</td></tr><tr><td>TAFE or trade / University<small>Coalition · May 2025–Nov 2026</small></td>
+        <td>1.00×</td><td>0.87×</td><td>−13%</td></tr></tbody><tbody><tr><th class="facet-name" colspan="4" scope="rowgroup">State/territory</th></tr><tr><td>Vic / Qld<small>Coalition · May 2025–Nov 2026</small></td>
+        <td>0.92×</td><td>1.24×</td><td>+34%</td></tr><tr><td>NSW / Vic<small>Coalition · May 2025–Nov 2026</small></td>
+        <td>0.98×</td><td>0.78×</td><td>−20%</td></tr></tbody><tbody><tr><th class="facet-name" colspan="4" scope="rowgroup">Seat type</th></tr><tr><td>Inner metro / Provincial<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>0.44×</td><td>0.65×</td><td>+48%</td></tr><tr><td>Inner metro / Rural<small>One Nation · May 2025–Nov 2026</small></td>
+        <td>0.39×</td><td>0.54×</td><td>+38%</td></tr></tbody><tbody><tr><th class="facet-name" colspan="4" scope="rowgroup">Housing tenure</th></tr><tr><td>Mortgage / Renting<small>Coalition · May 2025–Nov 2026</small></td>
+        <td>1.43×</td><td>1.72×</td><td>+20%</td></tr><tr><td>Own outright / Renting<small>Coalition · May 2025–Nov 2026</small></td>
+        <td>1.85×</td><td>2.20×</td><td>+19%</td></tr></tbody></table>
+    <p class="src">Change is the percentage change in relative support. Only shifts passing the main site’s 5% Holm-adjusted test across all parties and group pairs within each demographic are shown.</p>
     </div></section>
 </main>
 <script>
